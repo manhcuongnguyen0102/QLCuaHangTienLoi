@@ -4,7 +4,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 public class DBConnection {
     // Thay đổi thông tin này cho phù hợp với máy của bạn
-    private static final String SERVER_NAME = "localhost\\SQLEXPRESS"; // Hoặc tên máy tính của bạn (VD: LAPTOP-6IOOCEDN)
+    private static final String SERVER_NAME = "localhost"; // Hoặc tên máy tính của bạn (VD: LAPTOP-6IOOCEDN)
+   // private static final String SERVER_NAME = "localhost";
     private static final String DB_NAME = "QLCuaHangTienLoi";
     private static final String PORT = "1433"; // Cổng mặc định của SQL Server
 
@@ -25,6 +26,7 @@ public class DBConnection {
             String url = "jdbc:sqlserver://" + SERVER_NAME + ":" + PORT
                     + ";databaseName=" + DB_NAME
                     + ";encrypt=true;trustServerCertificate=true;";
+            jdbc:sqlserver://localhost:1433;databaseName=QLCuaHangTienLoi
 
             // 3. Mở kết nối
             conn = DriverManager.getConnection(url, USER, PASS);
