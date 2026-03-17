@@ -2,8 +2,12 @@
   <library name="gson-2.10.1">
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/lib/gson-2.10.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../mssql-jdbc-13.2.1.jre11.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
+    <excluded>
+      <root url="jar://$PROJECT_DIR$/../mssql-jdbc-13.2.1.jre11.jar!/" />
+    </excluded>
   </library>
 </component>
