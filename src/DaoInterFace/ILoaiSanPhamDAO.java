@@ -6,4 +6,7 @@ import model.LoaiSanPham;
 public interface ILoaiSanPhamDAO {
     List<LoaiSanPham> layTatCa();
     boolean them(LoaiSanPham loai);
+    boolean capNhat(LoaiSanPham loai);
+    LoaiSanPham timTheoMa(String maLoai);
+    boolean xoa(String maLoai);
 }

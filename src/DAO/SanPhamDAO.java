@@ -8,7 +8,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SanPhamDAO implements ISanPhamDAO {
-
+    private SanPham extractSanPham(ResultSet rs) throws SQLException {
+        SanPham sp = new SanPham();
+        sp.setMaSanPham(rs.getString("maSanPham"));
+        sp.setTenSanPham(rs.getString("tenSanPham"));
+        sp.setGiaNhap(rs.getDouble("giaNhap"));
+        sp.setGiaBan(rs.getDouble("giaBan"));
+        sp.setSoLuongTon(rs.getInt("soLuongTon"));
+        sp.setNgayHetHan(rs.getDate("ngayHetHan"));
+        sp.setMaLoai(rs.getString("maLoai"));
+        sp.setMaNCC(rs.getString("maNCC"));
+        return sp;
+    }
     @Override
     public List<SanPham> layTatCa() {
         List<SanPham> list = new ArrayList<>();
@@ -17,21 +28,28 @@ public class SanPhamDAO implements ISanPhamDAO {
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                SanPham sp = new SanPham();
-                sp.setMaSanPham(rs.getString("maSanPham"));
-                sp.setTenSanPham(rs.getString("tenSanPham"));
-                sp.setGiaNhap(rs.getDouble("giaNhap"));
-                sp.setGiaBan(rs.getDouble("giaBan"));
-                sp.setSoLuongTon(rs.getInt("soLuongTon"));
-                sp.setNgayHetHan(rs.getDate("ngayHetHan"));
-                sp.setMaLoai(rs.getString("maLoai"));
-                sp.setMaNCC(rs.getString("maNCC"));
-                list.add(sp);
+                list.add(extractSanPham(rs));
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return list;
+    }
+    @Override
+    public SanPham timTheoMa(String maSP) {
+        String sql = "SELECT * FROM SanPham WHERE maSanPham = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, maSP);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return extractSanPham(rs);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override
@@ -43,16 +61,7 @@ public class SanPhamDAO implements ISanPhamDAO {
             ps.setString(1, "%" + ten + "%");
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    SanPham sp = new SanPham();
-                    sp.setMaSanPham(rs.getString("maSanPham"));
-                    sp.setTenSanPham(rs.getString("tenSanPham"));
-                    sp.setGiaNhap(rs.getDouble("giaNhap"));
-                    sp.setGiaBan(rs.getDouble("giaBan"));
-                    sp.setSoLuongTon(rs.getInt("soLuongTon"));
-                    sp.setNgayHetHan(rs.getDate("ngayHetHan"));
-                    sp.setMaLoai(rs.getString("maLoai"));
-                    sp.setMaNCC(rs.getString("maNCC"));
-                    list.add(sp);
+                    list.add(extractSanPham(rs));
                 }
             }
         } catch (SQLException e) {
@@ -70,16 +79,7 @@ public class SanPhamDAO implements ISanPhamDAO {
             ps.setString(1, maLoai);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    SanPham sp = new SanPham();
-                    sp.setMaSanPham(rs.getString("maSanPham"));
-                    sp.setTenSanPham(rs.getString("tenSanPham"));
-                    sp.setGiaNhap(rs.getDouble("giaNhap"));
-                    sp.setGiaBan(rs.getDouble("giaBan"));
-                    sp.setSoLuongTon(rs.getInt("soLuongTon"));
-                    sp.setNgayHetHan(rs.getDate("ngayHetHan"));
-                    sp.setMaLoai(rs.getString("maLoai"));
-                    sp.setMaNCC(rs.getString("maNCC"));
-                    list.add(sp);
+                    list.add(extractSanPham(rs));
                 }
             }
         } catch (SQLException e) {
@@ -127,7 +127,19 @@ public class SanPhamDAO implements ISanPhamDAO {
         }
         return false;
     }
-
+    @Override
+    public boolean xoa(String maSP) {
+        String sql = "DELETE FROM SanPham WHERE maSanPham = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, maSP);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Lỗi XÓA: Sản phẩm đang tồn tại trong Chi Tiết Hóa Đơn hoặc Chi Tiết Phiếu Nhập!");
+            e.printStackTrace();
+        }
+        return false;
+    }
     @Override
     public boolean capNhatSoLuongTon(String maSP, int soLuongThayDoi) {
         String sql = "UPDATE SanPham SET soLuongTon = soLuongTon + ? WHERE maSanPham = ?";

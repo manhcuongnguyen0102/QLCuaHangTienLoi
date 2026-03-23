@@ -11,4 +11,6 @@ public interface ISanPhamDAO {
     boolean sua(SanPham sp);
     // Quan trọng: Thay đổi số lượng tồn kho sau khi mua/nhập hàng
     boolean capNhatSoLuongTon(String maSP, int soLuongThayDoi);
+    public boolean xoa(String maSP);
+    public SanPham timTheoMa(String maSP);
 }

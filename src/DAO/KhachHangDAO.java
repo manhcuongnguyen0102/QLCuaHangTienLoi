@@ -87,7 +87,7 @@ public class KhachHangDAO implements IKhachHangDAO {
 
             Connection conn = DBConnection.getConnection();
 
-            String sql = "INSERT INTO KhachHang VALUES (?,?,?,?,?,?)";
+            String sql = "INSERT INTO KhachHang (maKhachHang, tenKhachHang, soDienThoai, ngayDangKy, tenDangNhap, diemTichLuy) VALUES (?,?,?,?,?,?)";
 
             PreparedStatement ps = conn.prepareStatement(sql);
 
@@ -129,4 +129,5 @@ public class KhachHangDAO implements IKhachHangDAO {
 
         return false;
     }
+
 }
