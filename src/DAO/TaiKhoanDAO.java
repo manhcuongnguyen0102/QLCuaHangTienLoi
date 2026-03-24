@@ -77,20 +77,7 @@ public class TaiKhoanDAO implements ITaiKhoanDAO {
         }
         return false;
     }
-    private String taoMaKhachHangMoi(Connection conn) throws SQLException {
-        String sql = "SELECT TOP 1 maKhachHang FROM KhachHang ORDER BY maKhachHang DESC";
-        try (PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                String maCu = rs.getString("maKhachHang"); // Ví dụ: "KH001"
-                // Cắt chuỗi lấy phần số, cộng thêm 1
-                int soTiepTheo = Integer.parseInt(maCu.substring(2)) + 1;
-                // Trả về định dạng KH + 3 chữ số (VD: KH002)
-                return String.format("KH%03d", soTiepTheo);
-            }
-        }
-        return "KH001"; // Nếu chưa có khách nào thì bắt đầu từ KH001
-    }
+
     @Override
     public boolean dangKyTaiKhoan(String tenDangNhap, String matKhau) {
         // ĐỔI 'NhanVien' THÀNH 'KhachHang' ĐỂ BẢO MẬT HỆ THỐNG
@@ -137,7 +124,8 @@ public class TaiKhoanDAO implements ITaiKhoanDAO {
             }
 
             // Bước 2: Lấy mã khách hàng mới
-            String maMoi = taoMaKhachHangMoi(conn);
+            KhachHangDAO khDao = new KhachHangDAO();
+            String maMoi = khDao.taoMaKhachHangMoi(conn);
 
             // Bước 3: Lưu thông tin khách hàng
             try (PreparedStatement psKH = conn.prepareStatement(sqlKH)) {

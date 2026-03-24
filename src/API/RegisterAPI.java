@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-@WebServlet("/API/Register")
+@WebServlet("/API/RegisterAPI")
 public class RegisterAPI  extends HttpServlet{
     private TaiKhoanDAO tk= new TaiKhoanDAO();
     private Gson gson = new Gson();
@@ -31,6 +31,7 @@ public class RegisterAPI  extends HttpServlet{
 
         // 1. Thiết lập phản hồi trả về là JSON và hỗ trợ Tiếng Việt
         response.setHeader("Access-Control-Allow-Origin", "*");
+        request.setCharacterEncoding("UTF-8");
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         PrintWriter out = response.getWriter();
