@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập | Cửa Hàng Tiện Lợi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/frontend/css/login.css">
+</head>
+<body>
+
+    <div class="split-screen">
+        
+        <div class="left-pane">
+            <i class="fas fa-shopping-basket main-icon"></i>
+            <h1>Cửa Hàng Tiện Lợi</h1>
+            <p>Mang sự thuận tiện đến tay người tiêu dùng.</p>
+        </div>
+
+        <div class="right-pane">
+            <div class="login-container">
+                <div class="login-header">
+                    <h2>Chào mừng quay lại</h2>
+                    <p>Đăng nhập để vào hệ thống</p>
+                </div>
+
+                <div id="messageBox" class="message-box" style="display: none;"></div>
+
+                <form id="loginForm">
+                    <div class="input-group">
+                        <label for="username">Tên đăng nhập</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-user icon"></i>
+                            <input type="text" id="username" required placeholder="Nhập tài khoản của bạn">
+                        </div>
+                    </div>
+                    
+                    <div class="input-group" style="margin-bottom: 10px;">
+                        <label for="password">Mật khẩu</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-lock icon"></i>
+                            <input type="password" id="password" required placeholder="••••••••">
+                        </div>
+                    </div>
+
+                    <div class="forgot-password">
+                        <a href="forgot-password.html">Quên mật khẩu?</a>
+                    </div>
+
+                    <button type="submit" id="loginBtn">Đăng nhập ngay</button>
+
+                    <div class="divider">
+                        <span>hoặc</span>
+                    </div>
+                    
+                    <button type="button" class="btn-secondary" onclick="window.location.href='register.html'">
+                        Đăng ký tài khoản mới
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="/frontend/js/login.js" defer></script>
+</body>
+</html>

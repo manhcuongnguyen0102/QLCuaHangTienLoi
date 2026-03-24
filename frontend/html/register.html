@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký | Cửa Hàng Tiện Lợi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/frontend/css/login.css">
+</head>
+<body>
+
+    <div class="split-screen">
+        
+        <div class="left-pane">
+            <i class="fas fa-user-plus main-icon"></i>
+            <h1>Đăng ký thành viên</h1>
+            <p>Tạo tài khoản thành viên để nhận được nhiều ưu đãi</p>
+        </div>
+
+        <div class="right-pane">
+            <div class="login-container">
+                <div class="login-header">
+                    <h2>Tạo Tài Khoản</h2>
+                    <p>Đăng ký tài khoản  mới</p>
+                </div>
+
+                <div id="messageBox" class="message-box" style="display: none;"></div>
+                <form id="registerForm">
+                    <div class="input-group">
+                        <label for="reg-tenkh">Họ và tên</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-id-card icon"></i>
+                            <input type="text" id="reg-tenkh" required placeholder="Nhập họ tên của bạn">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="reg-username">Tên đăng nhập mới</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-user-circle icon"></i>
+                            <input type="text" id="reg-username" required placeholder="Nhập tên tài khoản (viết liền không dấu)">
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="reg-password">Mật khẩu</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-key icon"></i>
+                            <input type="password" id="reg-password" required placeholder="Tạo mật khẩu an toàn">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="reg-phone">Số điện thoại</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-phone icon"></i>
+                            <input type="text" id="reg-phone" required placeholder="Nhập số điện thoại">
+                        </div>
+                    </div>
+
+                    <div class="input-group" style="margin-bottom: 25px;">
+                        <label for="reg-confirm-password">Xác nhận mật khẩu</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-check-double icon"></i>
+                            <input type="password" id="reg-confirm-password" required placeholder="Xác nhận lại mật khẩu">
+                        </div>
+                    </div>
+
+                    <button type="submit" id="registerBtn">Đăng ký tài khoản</button>
+
+                    <div class="divider">
+                        <span>đã có tài khoản?</span>
+                    </div>
+
+                    <button type="button" class="btn-secondary" onclick="window.location.href='login.html'">
+                        Quay lại Đăng nhập
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="/frontend/js/register.js" defer></script>
+    </body>
+</html>

@@ -1,0 +1,258 @@
+/* =========================================
+   GIAO DIỆN MODERNSPLIT - ĐỘC QUYỀN MINIMART POS
+========================================= */
+
+/* Reset CSS */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Roboto', sans-serif;
+}
+
+body {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* Nền Gradient di chuyển mượt mà */
+    background: linear-gradient(-45deg, #16a085, #2ecc71, #27ae60, #1abc9c);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+    overflow: hidden;
+}
+
+/* Hiệu ứng nền di chuyển */
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* BỘ KHUNG SPLIT SCREEN */
+.split-screen {
+    display: flex;
+    width: 900px;
+    height: 700px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    /* Hiệu ứng entrance mượt mà */
+    animation: slideIn 0.8s ease-out;
+}
+
+@keyframes slideIn {
+    0% { transform: translateY(50px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+/* PANE TRÁI - ĐỒ HỌA/GIỚI THIỆU (Nổi bật) */
+.left-pane {
+    flex: 1;
+    background: linear-gradient(135deg, rgba(22, 160, 133, 0.9), rgba(46, 204, 113, 0.8)), 
+                url('https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=600') no-repeat center center;
+    background-size: cover;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    padding: 60px 40px;
+    text-align: center;
+}
+
+.left-pane .main-icon {
+    font-size: 80px;
+    margin-bottom: 20px;
+}
+
+.left-pane h1 {
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+}
+
+.left-pane p {
+    font-size: 16px;
+    line-height: 1.6;
+    opacity: 0.9;
+}
+
+/* PANE PHẢI - CHỨA FORM */
+.right-pane {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    background-color: white;
+  
+}
+
+.login-container {
+    width: 100%;
+}
+
+.login-header {
+    margin-bottom: 30px;
+    text-align: left;
+}
+
+.login-header h2 {
+    color: #333;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.login-header p {
+    color: #777;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+/* STYLE CHO Ô NHẬP LIỆU CÓ ICON */
+.input-group {
+    margin-bottom: 12px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #555;
+    font-weight: 500;
+    font-size: 13px;
+}
+
+.input-with-icon {
+    position: relative;
+}
+
+/* Icon nằm bên trái ô input */
+.input-with-icon .icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #aaa;
+    font-size: 16px;
+    transition: color 0.3s;
+}
+
+.input-with-icon input {
+    width: 100%;
+    padding: 12px 15px 12px 45px; /* Thêm padding-left để chừa chỗ cho icon */
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 15px;
+    background-color: #fafafa;
+    transition: all 0.3s ease;
+}
+
+.input-with-icon input:focus {
+    outline: none;
+    border-color: #2ecc71;
+    background-color: white;
+    box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.1);
+}
+
+/* Khi ô input được click chuột -> Đổi màu icon */
+.input-with-icon input:focus + .icon {
+    color: #2ecc71;
+}
+
+/* STYLE NÚT BẤM (Nâng cấp bóng mượt) */
+button {
+    width: 100%;
+    padding: 14px;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 15px;
+}
+
+#loginBtn, #registerBtn {
+    background: linear-gradient(to right, #2ecc71, #27ae60);
+    box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+}
+
+button:hover {
+    transform: translateY(-2px); /* Bay nhẹ lên khi rê chuột */
+    box-shadow: 0 6px 20px rgba(46, 204, 113, 0.4);
+}
+
+button:active {
+    transform: translateY(1px); /* Lún xuống khi bấm */
+}
+
+/* Nút phụ nền trắng viền xanh */
+.btn-secondary {
+    background-color: #fff;
+    color: #2ecc71;
+    border: 2px solid #2ecc71;
+    margin-bottom: 0;
+}
+
+.btn-secondary:hover {
+    background-color: #f0fdf4;
+    color: #27ae60;
+    border-color: #27ae60;
+    box-shadow: none;
+}
+
+/* THÀNH PHẦN PHỤ */
+.forgot-password {
+    text-align: right;
+    margin-top: -10px;
+    margin-bottom: 20px;
+}
+
+.forgot-password a {
+    color: #777;
+    font-size: 13px;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.forgot-password a:hover {
+    color: #2ecc71;
+    text-decoration: underline;
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 20px 0;
+    color: #aaa;
+    font-size: 13px;
+}
+
+.divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #eee;
+}
+
+.divider span {
+    padding: 0 10px;
+}
+
+/* Hộp thông báo lỗi */
+.message-box {
+    padding: 12px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    text-align: center;
+    border: 1px solid;
+}
+
+.message-error { background-color: #fee2e2; color: #dc2626; border-color: #f87171; }
+.message-success { background-color: #dcfce3; color: #16a34a; border-color: #86efac; }
