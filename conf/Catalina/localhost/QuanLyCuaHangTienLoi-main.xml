@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Context docBase="D:\java\QLCuaHangTienLoi-main\frontend">
+  <Resources cacheMaxSize="10240">
+    <PreResources base="D:/java/QLCuaHangTienLoi-main/out/production/BTL_JAVA" className="org.apache.catalina.webresources.DirResourceSet" webAppMount="/WEB-INF/classes"/>
+    <PostResources base="D:/java/QLCuaHangTienLoi-main/lib/gson-2.10.1.jar" className="org.apache.catalina.webresources.FileResourceSet" webAppMount="/WEB-INF/lib/gson-2.10.1.jar"/>
+    <PostResources base="D:/java/mssql-jdbc-13.2.1.jre11.jar" className="org.apache.catalina.webresources.FileResourceSet" webAppMount="/WEB-INF/lib/mssql-jdbc-13.2.1.jre11.jar"/>
+    <PostResources base="D:/java/QLCuaHangTienLoi-main/lib/javax.servlet-api-4.0.1.jar" className="org.apache.catalina.webresources.FileResourceSet" webAppMount="/WEB-INF/lib/javax.servlet-api-4.0.1.jar"/>
+    <PostResources base="D:/java/QLCuaHangTienLoi-main/lib/mssql-jdbc-13.2.1.jre11.jar" className="org.apache.catalina.webresources.FileResourceSet" webAppMount="/WEB-INF/lib/mssql-jdbc-13.2.1.jre11.jar"/>
+  </Resources>
+</Context>

@@ -1,0 +1,13 @@
+0:0:0:0:0:0:0:1 - - [24/Mar/2026:17:06:10 +0700] "GET /QuanLyCuaHangTienLoi-main HTTP/1.1" 302 -
+0:0:0:0:0:0:0:1 - - [24/Mar/2026:17:06:10 +0700] "GET /QuanLyCuaHangTienLoi-main/ HTTP/1.1" 404 782
+0:0:0:0:0:0:0:1 - - [24/Mar/2026:17:06:10 +0700] "GET /favicon.ico HTTP/1.1" 404 683
+0:0:0:0:0:0:0:1 - - [24/Mar/2026:17:06:24 +0700] "GET /QuanLyCuaHangTienLoi-main HTTP/1.1" 302 -
+0:0:0:0:0:0:0:1 - - [24/Mar/2026:17:06:24 +0700] "GET /QuanLyCuaHangTienLoi-main/ HTTP/1.1" 404 782
+0:0:0:0:0:0:0:1 - - [24/Mar/2026:17:08:47 +0700] "GET /QuanLyCuaHangTienLoi-main/API/NhaCungCapAPI HTTP/1.1" 200 349
+0:0:0:0:0:0:0:1 - - [24/Mar/2026:17:10:45 +0700] "POST /QuanLyCuaHangTienLoi-main/API/NhaCungCapAPI HTTP/1.1" 500 115
+0:0:0:0:0:0:0:1 - - [24/Mar/2026:17:16:04 +0700] "POST /QuanLyCuaHangTienLoi-main/API/NhaCungCapAPI HTTP/1.1" 200 187
+0:0:0:0:0:0:0:1 - - [24/Mar/2026:17:16:48 +0700] "GET /QuanLyCuaHangTienLoi-main/API/NhaCungCapAPI HTTP/1.1" 200 461
+0:0:0:0:0:0:0:1 - - [24/Mar/2026:17:18:47 +0700] "POST /QuanLyCuaHangTienLoi-main/API/NhaCungCapAPI HTTP/1.1" 200 187
+0:0:0:0:0:0:0:1 - - [24/Mar/2026:17:19:57 +0700] "GET /QuanLyCuaHangTienLoi-main/API/NhaCungCapAPI HTTP/1.1" 200 573
+0:0:0:0:0:0:0:1 - - [24/Mar/2026:17:23:00 +0700] "POST /QuanLyCuaHangTienLoi-main/API/NhaCungCapAPI HTTP/1.1" 200 187
+0:0:0:0:0:0:0:1 - - [24/Mar/2026:17:25:17 +0700] "POST /QuanLyCuaHangTienLoi-main/API/NhaCungCapAPI HTTP/1.1" 200 182
