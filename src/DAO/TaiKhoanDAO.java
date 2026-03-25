@@ -3,6 +3,7 @@ package DAO;
 import DaoInterFace.DBConnection;
 import DaoInterFace.ITaiKhoanDAO;
 import model.TaiKhoan;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -77,6 +78,7 @@ public class TaiKhoanDAO implements ITaiKhoanDAO {
         }
         return false;
     }
+
     private String taoMaKhachHangMoi(Connection conn) throws SQLException {
         String sql = "SELECT TOP 1 maKhachHang FROM KhachHang ORDER BY maKhachHang DESC";
         try (PreparedStatement ps = conn.prepareStatement(sql);
@@ -91,6 +93,7 @@ public class TaiKhoanDAO implements ITaiKhoanDAO {
         }
         return "KH001"; // Nếu chưa có khách nào thì bắt đầu từ KH001
     }
+
     @Override
     public boolean dangKyTaiKhoan(String tenDangNhap, String matKhau) {
         // ĐỔI 'NhanVien' THÀNH 'KhachHang' ĐỂ BẢO MẬT HỆ THỐNG
@@ -105,6 +108,7 @@ public class TaiKhoanDAO implements ITaiKhoanDAO {
         }
         return false;
     }
+
     @Override
     public boolean kiemTraTonTai(String tenDangNhap) {
         String sql = "SELECT 1 FROM TaiKhoan WHERE tenDangNhap = ?";
@@ -119,6 +123,7 @@ public class TaiKhoanDAO implements ITaiKhoanDAO {
         }
         return false;
     }
+
     @Override
     public boolean dangKyKhachHang(String tenKH, String sdt, String tenDN, String matKhau) {
         String sqlTK = "INSERT INTO TaiKhoan (tenDangNhap, matKhau, vaiTro, trangThai) VALUES (?, ?, 'CUSTOMER', 1)";
@@ -152,13 +157,23 @@ public class TaiKhoanDAO implements ITaiKhoanDAO {
             return true;
         } catch (SQLException e) {
             if (conn != null) {
-                try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); } // HỦY NẾU LỖI
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                } // HỦY NẾU LỖI
             }
             e.printStackTrace();
             return false;
         } finally {
             // Đóng kết nối an toàn
-            try { if(conn != null) { conn.setAutoCommit(true); conn.close(); } } catch (Exception e) {}
+            try {
+                if (conn != null) {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                }
+            } catch (Exception e) {
+            }
         }
     }
 
@@ -175,6 +190,7 @@ public class TaiKhoanDAO implements ITaiKhoanDAO {
         }
         return false;
     }
+
     @Override
     public boolean doiMatKhauBangSDT(String sdt, String matKhauMoi) {
         // Cập nhật mật khẩu của tài khoản nào có số điện thoại tương ứng trong bảng KhachHang
@@ -194,4 +210,16 @@ public class TaiKhoanDAO implements ITaiKhoanDAO {
         return false;
     }
 
+    public boolean taoTaiKhoanNhanVien(String tenDangNhap, String matKhau) {
+        String sql = "insert into TaiKhoan (tenDangNhap, matKhau, vaiTro, trangThai) values (?, ?, 'STAFF', 1)";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, tenDangNhap);
+            ps.setString(2, matKhau);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

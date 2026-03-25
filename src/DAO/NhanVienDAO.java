@@ -1,4 +1,5 @@
 package DAO;
+
 import DaoInterFace.INhanVienDAO;
 import DaoInterFace.DBConnection;
 import model.NhanVien;
@@ -16,8 +17,8 @@ public class NhanVienDAO implements INhanVienDAO {
         String sql = "SELECT * FROM NhanVien";
 
         try (Connection conn = DBConnection.getConnection();
-            Statement st = conn.createStatement();
-            ResultSet rs = st.executeQuery(sql);){
+             Statement st = conn.createStatement();
+             ResultSet rs = st.executeQuery(sql);) {
 
             while (rs.next()) {
 
@@ -119,4 +120,27 @@ public class NhanVienDAO implements INhanVienDAO {
         }
         return false;
     }
+
+    public String sinhMaNhanVien() {
+        int max = 0;
+        String sql = "select maNhanVien from NhanVien";
+        try (Connection conn = DBConnection.getConnection();
+             Statement st = conn.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+            while (rs.next()) {
+                String ma = rs.getString("maNhanVien");
+                if (ma != null && ma.startsWith("NV")) {
+                    try {
+                        int so = Integer.parseInt(ma.substring(2));
+                        if (so > max) max = so;
+                    } catch (NumberFormatException ignored) {
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return String.format("NV%03d", max + 1);
+    }
+
 }
