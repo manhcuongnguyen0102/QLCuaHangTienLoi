@@ -140,13 +140,23 @@ public class TaiKhoanDAO implements ITaiKhoanDAO {
             return true;
         } catch (SQLException e) {
             if (conn != null) {
-                try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); } // HỦY NẾU LỖI
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                } // HỦY NẾU LỖI
             }
             e.printStackTrace();
             return false;
         } finally {
             // Đóng kết nối an toàn
-            try { if(conn != null) { conn.setAutoCommit(true); conn.close(); } } catch (Exception e) {}
+            try {
+                if (conn != null) {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                }
+            } catch (Exception e) {
+            }
         }
     }
 
@@ -182,4 +192,16 @@ public class TaiKhoanDAO implements ITaiKhoanDAO {
         return false;
     }
 
+    public boolean taoTaiKhoanNhanVien(String tenDangNhap, String matKhau) {
+        String sql = "insert into TaiKhoan (tenDangNhap, matKhau, vaiTro, trangThai) values (?, ?, 'STAFF', 1)";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, tenDangNhap);
+            ps.setString(2, matKhau);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

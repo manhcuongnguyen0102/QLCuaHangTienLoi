@@ -173,5 +173,87 @@ public class ThongKeDAO {
         }
         return list;
     }
+    // Thong ke doanh thu trong ngay
+    public double doanhThuHomNay() {
+        double tong = 0;
+        String sql = "SELECT SUM(tongTien) AS tong FROM HoaDon WHERE CAST(ngayLap AS DATE) = CAST(GETDATE() AS DATE)";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) tong = rs.getDouble("tong");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return tong;
+    }
+
+    public int soHoaDonHomNay() {
+        int tong = 0;
+        String sql = "SELECT COUNT(*) AS tong FROM HoaDon WHERE CAST(ngayLap AS DATE) = CAST(GETDATE() AS DATE)";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) tong = rs.getInt("tong");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return tong;
+    }
+
+    public int soKhachHangMoiHomNay() {
+        int tong = 0;
+        String sql = "SELECT COUNT(*) AS tong FROM KhachHang WHERE CAST(ngayDangKy AS DATE) = CAST(GETDATE() AS DATE)";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) tong = rs.getInt("tong");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return tong;
+    }
+
+    public int soSanPhamSapHet() {
+        int tong = 0;
+        String sql = "SELECT COUNT(*) AS tong FROM SanPham WHERE soLuongTon < 10";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) tong = rs.getInt("tong");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return tong;
+    }
+
+    public List<SanPham> layTop5BanChayTrongThang() {
+        List<SanPham> list = new ArrayList<>();
+        String sql = "SELECT TOP 5 sp.maSanPham, sp.tenSanPham, sp.giaNhap, sp.giaBan, sp.soLuongTon, sp.ngayHetHan, sp.maLoai, sp.maNCC " +
+                "FROM SanPham sp " +
+                "JOIN ChiTietHoaDon cthd ON sp.maSanPham = cthd.maSanPham " +
+                "JOIN HoaDon hd ON cthd.maHoaDon = hd.maHoaDon " +
+                "WHERE MONTH(hd.ngayLap) = MONTH(GETDATE()) AND YEAR(hd.ngayLap) = YEAR(GETDATE()) " +
+                "GROUP BY sp.maSanPham, sp.tenSanPham, sp.giaNhap, sp.giaBan, sp.soLuongTon, sp.ngayHetHan, sp.maLoai, sp.maNCC " +
+                "ORDER BY SUM(cthd.soLuong) DESC";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                SanPham sp = new SanPham();
+                sp.setMaSanPham(rs.getString("maSanPham"));
+                sp.setTenSanPham(rs.getString("tenSanPham"));
+                sp.setGiaNhap(rs.getDouble("giaNhap"));
+                sp.setGiaBan(rs.getDouble("giaBan"));
+                sp.setSoLuongTon(rs.getInt("soLuongTon"));
+                sp.setNgayHetHan(rs.getDate("ngayHetHan"));
+                sp.setMaLoai(rs.getString("maLoai"));
+                sp.setMaNCC(rs.getString("maNCC"));
+                list.add(sp);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 
 }
