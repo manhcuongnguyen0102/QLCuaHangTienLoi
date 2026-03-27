@@ -11,8 +11,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     registerForm.addEventListener('submit', function(event) {
-        event.preventDefault(); 
-        
+        event.preventDefault(); // Ngăn trang web bị load lại
+
+        // 1. Lấy dữ liệu từ các ô nhập liệu (Dựa trên ID trong file HTML của bạn)
         const tenKH = document.getElementById('reg-tenkh').value;
         const sdt = document.getElementById('reg-phone').value;
         const user = document.getElementById('reg-username').value;

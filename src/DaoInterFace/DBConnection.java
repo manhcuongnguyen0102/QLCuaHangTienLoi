@@ -8,7 +8,6 @@ public class DBConnection {
    // private static final String SERVER_NAME = "localhost";
     private static final String DB_NAME = "QLCuaHangTienLoi";
     private static final String PORT = "1433"; // Cổng mặc định của SQL Server
-
     // Nếu SQL Server của bạn dùng quyền Windows Authentication (không cần user/pass):
     // Cần thêm tham số integratedSecurity=true vào chuỗi kết nối.
     // Dưới đây là chuỗi kết nối sử dụng tài khoản sa (Khuyên dùng)

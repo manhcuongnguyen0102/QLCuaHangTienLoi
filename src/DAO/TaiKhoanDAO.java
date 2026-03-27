@@ -127,6 +127,7 @@ public class TaiKhoanDAO implements ITaiKhoanDAO {
             KhachHangDAO khDao = new KhachHangDAO();
             String maMoi = khDao.taoMaKhachHangMoi(conn);
 
+
             // Bước 3: Lưu thông tin khách hàng
             try (PreparedStatement psKH = conn.prepareStatement(sqlKH)) {
                 psKH.setString(1, maMoi);

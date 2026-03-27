@@ -18,6 +18,7 @@ import java.util.List;
 
 @WebServlet("/API/SanPhamAPI/*")
 public class SanPhamAPI extends HttpServlet {
+
     private SanPhamDAO dao = new SanPhamDAO();
     private Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
 
@@ -30,6 +31,7 @@ public class SanPhamAPI extends HttpServlet {
         resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
     }
 
+    //  GET
     @Override
     protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         setHeader(resp);
