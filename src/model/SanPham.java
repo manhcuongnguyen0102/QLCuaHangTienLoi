@@ -10,11 +10,12 @@ public class SanPham {
     private Date ngayHetHan;
     private String maLoai;
     private String maNCC;
-
+    private String tenLoai;
+    private String tenNCC;
     public SanPham() {
     }
 
-    public SanPham(String maSanPham, String tenSanPham, double giaNhap, double giaBan, int soLuongTon, Date ngayHetHan, String maLoai, String maNCC) {
+    public SanPham(String maSanPham, String tenSanPham, double giaNhap, double giaBan, int soLuongTon, Date ngayHetHan, String maLoai, String maNCC, String tenLoai, String tenNCC) {
         this.maSanPham = maSanPham;
         this.tenSanPham = tenSanPham;
         this.giaNhap = giaNhap;
@@ -23,6 +24,8 @@ public class SanPham {
         this.ngayHetHan = ngayHetHan;
         this.maLoai = maLoai;
         this.maNCC = maNCC;
+        this.tenLoai=tenLoai;
+        this.tenNCC=tenNCC;
     }
 
     public double getGiaBan() {
@@ -87,6 +90,22 @@ public class SanPham {
 
     public void setTenSanPham(String tenSanPham) {
         this.tenSanPham = tenSanPham;
+    }
+
+    public String getTenLoai() {
+        return tenLoai;
+    }
+
+    public void setTenLoai(String tenLoai) {
+        this.tenLoai = tenLoai;
+    }
+
+    public String getTenNCC() {
+        return tenNCC;
+    }
+
+    public void setTenNCC(String tenNCC) {
+        this.tenNCC = tenNCC;
     }
 }
 

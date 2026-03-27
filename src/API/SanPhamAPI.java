@@ -1,282 +1,170 @@
 package API;
 
 import DAO.SanPhamDAO;
-import DaoInterFace.DBConnection;
+import com.google.gson.GsonBuilder;
 import model.SanPham;
-
-import javax.servlet.*;
-import javax.servlet.http.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.GsonBuilder;
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import java.io.*;
-import java.sql.*;
-import java.sql.Date;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
 
-@WebServlet("/API/SanPhamAPI")
+@WebServlet("/API/SanPhamAPI/*")
 public class SanPhamAPI extends HttpServlet {
-
     private SanPhamDAO dao = new SanPhamDAO();
+    private Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
 
-    //  GET
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
-        response.setContentType("application/json;charset=UTF-8");
-
-        String sql = "SELECT sp.*, l.tenLoai, n.tenNCC " +
-                "FROM SanPham sp " +
-                "JOIN LoaiSanPham l ON sp.maLoai = l.maLoai " +
-                "JOIN NhaCungCap n ON sp.maNCC = n.maNCC";
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-
-            PrintWriter out = response.getWriter();
-            out.print("[");
-
-            boolean first = true;
-            while (rs.next()) {
-                if (!first) out.print(",");
-                first = false;
-
-                out.print("{");
-                out.print("\"maSanPham\":\"" + rs.getString("maSanPham") + "\",");
-                out.print("\"tenSanPham\":\"" + rs.getString("tenSanPham") + "\",");
-                out.print("\"giaNhap\":" + rs.getDouble("giaNhap") + ",");
-                out.print("\"giaBan\":" + rs.getDouble("giaBan") + ",");
-                out.print("\"soLuongTon\":" + rs.getInt("soLuongTon") + ",");
-                out.print("\"ngayHetHan\":\"" + rs.getDate("ngayHetHan") + "\",");
-                out.print("\"tenLoai\":\"" + rs.getString("tenLoai") + "\",");
-                out.print("\"tenNCC\":\"" + rs.getString("tenNCC") + "\"");
-                out.print("}");
-            }
-
-            out.print("]");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    // Hàm hỗ trợ thiết lập Response chung (UTF-8 và CORS)
+    private void setHeader(HttpServletResponse resp) {
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+        resp.setHeader("Access-Control-Allow-Origin", "*");
+        resp.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
     }
 
-    //POST
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        setHeader(resp);
+        resp.setStatus(HttpServletResponse.SC_OK);
+    }
 
-        request.setCharacterEncoding("UTF-8");
-        response.setContentType("application/json;charset=UTF-8");
-
-        PrintWriter out = response.getWriter();
+    // GET: Lấy danh sách sản phẩm (Đã kèm TenLoai và TenNCC từ DAO)
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        setHeader(resp);
+        PrintWriter out = resp.getWriter();
 
         try {
-            String ten = request.getParameter("tenSanPham");
-            double giaNhap = Double.parseDouble(request.getParameter("giaNhap"));
-            double giaBan = Double.parseDouble(request.getParameter("giaBan"));
-            int soLuong = Integer.parseInt(request.getParameter("soLuongTon"));
-            String ngay = request.getParameter("ngayHetHan");
-            String maLoai = request.getParameter("maLoai");
-            String maNCC = request.getParameter("maNCC");
-
-            //  Check giá
-            if (giaBan <= giaNhap) {out.print("{\"message\":\"Giá bán phải lớn hơn giá nhập\"}");
-                return;
-            }
-
-            String maSP = "SP001";
-
-            try (Connection conn = DBConnection.getConnection()) {
-
-
-                PreparedStatement ps = conn.prepareStatement(
-                        "SELECT MAX(CAST(SUBSTRING(maSanPham, 3, LEN(maSanPham)) AS INT)) FROM SanPham");
-                ResultSet rs = ps.executeQuery();
-
-                if (rs.next() && rs.getObject(1) != null) {
-                    int max = rs.getInt(1);
-                    maSP = String.format("SP%03d", max + 1);
-                }
-
-                //  Check trùng (chống lỗi khi bấm nhanh)
-                boolean exists;
-                do {
-                    exists = false;
-
-                    PreparedStatement check = conn.prepareStatement(
-                            "SELECT COUNT(*) FROM SanPham WHERE maSanPham = ?");
-                    check.setString(1, maSP);
-                    ResultSet rs2 = check.executeQuery();
-                    rs2.next();
-
-                    if (rs2.getInt(1) > 0) {
-                        int num = Integer.parseInt(maSP.substring(2)) + 1;
-                        maSP = String.format("SP%03d", num);
-                        exists = true;
-                    }
-
-                } while (exists);
-            }
-
-            SanPham sp = new SanPham(
-                    maSP, ten, giaNhap, giaBan, soLuong,
-                    Date.valueOf(ngay), maLoai, maNCC
-            );
-
-            boolean kq = dao.them(sp);
-
-            if (kq) {
-                out.print("{\"message\":\"Thêm thành công\",\"maSanPham\":\"" + maSP + "\"}");
-            } else {
-                out.print("{\"message\":\"Thêm thất bại\"}");
-            }
-
+            List<SanPham> ds = dao.layTatCa();
+            // Gson sẽ tự động biến List thành chuỗi JSON chuẩn
+            out.print(gson.toJson(ds));
         } catch (Exception e) {
-            out.print("{\"message\":\"Lỗi dữ liệu\"}");
             e.printStackTrace();
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            out.print("{\"status\":\"error\", \"message\":\"Lỗi lấy danh sách sản phẩm\"}");
         }
     }
 
-    //  PUT
+    // POST: Thêm sản phẩm mới
     @Override
-    protected void doPut(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
-        request.setCharacterEncoding("UTF-8");
-        response.setContentType("application/json;charset=UTF-8");
-
-        PrintWriter out = response.getWriter();
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.setCharacterEncoding("UTF-8");
+        setHeader(resp);
+        PrintWriter out = resp.getWriter();
+        JsonObject jsonResponse = new JsonObject();
 
         try {
-            BufferedReader reader = request.getReader();
-            StringBuilder sb = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) sb.append(line);
+            // Đọc JSON từ body gửi lên và biến thành đối tượng SanPham
+            BufferedReader reader = req.getReader();
+            SanPham sp = gson.fromJson(reader, SanPham.class);
+            sp.setSoLuongTon(0);
+            if (sp == null || sp.getTenSanPham() == null||sp.getTenSanPham().trim().isEmpty()) {
+                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                jsonResponse.addProperty("status", "error");
+                jsonResponse.addProperty("message", "Dữ liệu không hợp lệ!");
 
-            String json = sb.toString();
-
-            String maSP = json.split("\"maSanPham\":\"")[1].split("\"")[0];
-            String ten = json.split("\"tenSanPham\":\"")[1].split("\"")[0];
-            double giaNhap = Double.parseDouble(json.split("\"giaNhap\":")[1].split(",")[0]);
-            double giaBan = Double.parseDouble(json.split("\"giaBan\":")[1].split(",")[0]);
-            int soLuong = Integer.parseInt(json.split("\"soLuongTon\":")[1].split(",")[0]);String ngay = json.split("\"ngayHetHan\":\"")[1].split("\"")[0];
-            String maLoai = json.split("\"maLoai\":\"")[1].split("\"")[0];
-            String maNCC = json.split("\"maNCC\":\"")[1].split("\"")[0];
-
-            if (giaBan <= giaNhap) {
-                out.print("{\"message\":\"Giá bán phải lớn hơn giá nhập\"}");
-                return;
             }
-
-            SanPham sp = new SanPham(
-                    maSP, ten, giaNhap, giaBan, soLuong,
-                    Date.valueOf(ngay), maLoai, maNCC
-            );
-
-            boolean kq = dao.sua(sp);
-
-            if (kq) {
-                out.print("{\"message\":\"Cập nhật thành công\"}");
-            } else {
-                out.print("{\"message\":\"Cập nhật thất bại\"}");
+            else if (sp.getGiaBan() < sp.getGiaNhap()) {
+                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                jsonResponse.addProperty("status", "error");
+                jsonResponse.addProperty("message", "Giá bán không được nhỏ hơn giá nhập!");
             }
-
-        } catch (Exception e) {
-            out.print("{\"message\":\"Lỗi JSON\"}");
-            e.printStackTrace();
-        }
-    }
-
-    //  DELETE
-    /*@Override
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
-        response.setContentType("application/json;charset=UTF-8");
-        PrintWriter out = response.getWriter();
-
-        String maSP = request.getParameter("maSanPham");
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(
-                     "SELECT COUNT(*) FROM ChiTietHoaDon WHERE maSanPham = ?")) {
-
-            ps.setString(1, maSP);
-            ResultSet rs = ps.executeQuery();
-            rs.next();
-
-            if (rs.getInt(1) > 0) {
-
-                //  Đã bán → cập nhật trạng thái
-                PreparedStatement ps2 = conn.prepareStatement(
-                        "UPDATE SanPham SET trangThai = N'Ngừng kinh doanh' WHERE maSanPham = ?");
-                ps2.setString(1, maSP);
-                ps2.executeUpdate();
-
-                out.print("{\"message\":\"Sản phẩm đã bán, chuyển sang Ngừng kinh doanh\"}");
-
-            } else {
-
-                //  Chưa bán → xóa cứng
-                boolean kq = dao.xoa(maSP);
-
-                if (kq) {
-                    out.print("{\"message\":\"Xóa thành công\"}");
+            else if (sp.getMaLoai() == null || sp.getMaNCC() == null) {
+                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                jsonResponse.addProperty("status", "error");
+                jsonResponse.addProperty("message", "Thiếu mã Loại hoặc mã Nhà cung cấp!");
+            }
+            else {
+                // Gọi DAO (Hàm them() của bạn đã có logic tự gọi sinhMaSanPhamMoi() rồi)
+                if (dao.them(sp)) {
+                    jsonResponse.addProperty("status", "success");
+                    jsonResponse.addProperty("message", "Thêm sản phẩm thành công!");
+                    jsonResponse.addProperty("maSanPham", sp.getMaSanPham()); // Trả về mã vừa sinh
                 } else {
-                    out.print("{\"message\":\"Xóa thất bại\"}");
+                    resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    jsonResponse.addProperty("status", "error");
+                    jsonResponse.addProperty("message", "Thêm sản phẩm thất bại!");
                 }
             }
-
         } catch (Exception e) {
             e.printStackTrace();
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            jsonResponse.addProperty("status", "error");
+            jsonResponse.addProperty("message", "Lỗi định dạng dữ liệu gửi lên!");
+        } finally {
+            out.print(jsonResponse.toString());
         }
-    }*/
+    }
+
+    // PUT: Cập nhật thông tin sản phẩm
     @Override
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.setCharacterEncoding("UTF-8");
+        setHeader(resp);
+        PrintWriter out = resp.getWriter();
+        JsonObject jsonResponse = new JsonObject();
 
-        response.setContentType("application/json;charset=UTF-8");
-        PrintWriter out = response.getWriter();
+        try {
+            SanPham sp = gson.fromJson(req.getReader(), SanPham.class);
 
-        String maSP = request.getParameter("maSanPham");
+            if (sp == null || sp.getMaSanPham() == null) {
+                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                jsonResponse.addProperty("status", "error");
+                jsonResponse.addProperty("message", "Thiếu mã sản phẩm để cập nhật!");
+            } else if (dao.sua(sp)) {
+                jsonResponse.addProperty("status", "success");
+                jsonResponse.addProperty("message", "Cập nhật sản phẩm thành công!");
+            } else {
+                jsonResponse.addProperty("status", "error");
+                jsonResponse.addProperty("message", "Cập nhật thất bại!");
+            }
+        } catch (Exception e) {
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            jsonResponse.addProperty("status", "error");
+            jsonResponse.addProperty("message", "Lỗi server: " + e.getMessage());
+        } finally {
+            out.print(jsonResponse.toString());
+        }
+    }
 
-        // ❗ check null
+    // DELETE: Xóa an toàn (Check khóa ngoại)
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        setHeader(resp);
+        PrintWriter out = resp.getWriter();
+        JsonObject jsonResponse = new JsonObject();
+
+        String maSP = req.getParameter("maSanPham");
+
         if (maSP == null || maSP.trim().isEmpty()) {
-            out.print("{\"message\":\"Thiếu mã sản phẩm\"}");
-            return;
-        }try (Connection conn = DBConnection.getConnection();
-              PreparedStatement ps = conn.prepareStatement(
-                      "SELECT COUNT(*) FROM ChiTietHoaDon WHERE maSanPham = ?")) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            jsonResponse.addProperty("status", "error");
+            jsonResponse.addProperty("message", "Thiếu mã sản phẩm!");
+        } else {
+            // Nhận kết quả từ hàm xoa() mới của DAO: 1: Xóa OK, 2: Đã bán - Không cho xóa, 0: Lỗi
+            int ketQua = dao.xoa(maSP);
 
-            ps.setString(1, maSP);
-            ResultSet rs = ps.executeQuery();
-            rs.next();
-
-            if (rs.getInt(1) > 0) {
-
-                // ❗ update trạng thái
-                try (PreparedStatement ps2 = conn.prepareStatement(
-                        "UPDATE SanPham SET trangThai = N'Ngừng kinh doanh' WHERE maSanPham = ?")) {
-
-                    ps2.setString(1, maSP);
-                    ps2.executeUpdate();
-                }
-
-                out.print("{\"message\":\"Sản phẩm đã bán, chuyển sang Ngừng kinh doanh\"}");
-
+            if (ketQua == 1) {
+                jsonResponse.addProperty("status", "success");
+                jsonResponse.addProperty("message", "Xóa sản phẩm thành công!");
+            } else if (ketQua == 2) {
+                resp.setStatus(HttpServletResponse.SC_CONFLICT); // Lỗi 409: Xung đột dữ liệu
+                jsonResponse.addProperty("status", "error");
+                jsonResponse.addProperty("message", "Không thể xóa! Sản phẩm này đã có trong lịch sử hóa đơn.");
             } else {
-
-                boolean kq = dao.xoa(maSP);
-
-                if (kq) {
-                    out.print("{\"message\":\"Xóa thành công\"}");
-                } else {
-                    out.print("{\"message\":\"Xóa thất bại\"}");
-                }
+                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                jsonResponse.addProperty("status", "error");
+                jsonResponse.addProperty("message", "Xóa sản phẩm thất bại!");
             }
-
-        } catch (Exception e) {
-            out.print("{\"message\":\"Lỗi server\"}");
-            e.printStackTrace();
         }
+        out.print(jsonResponse.toString());
     }
 }

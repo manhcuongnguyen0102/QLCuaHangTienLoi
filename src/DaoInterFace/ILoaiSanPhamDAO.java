@@ -8,5 +8,5 @@ public interface ILoaiSanPhamDAO {
     boolean them(LoaiSanPham loai);
     boolean capNhat(LoaiSanPham loai);
     LoaiSanPham timTheoMa(String maLoai);
-    boolean xoa(String maLoai);
+    int xoa(String maLoai);
 }

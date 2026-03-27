@@ -31,12 +31,18 @@ public class LoaiSanPhamDAO implements ILoaiSanPhamDAO {
 
     @Override
     public boolean them(LoaiSanPham loai) {
+        if (loai.getMaLoai() == null || loai.getMaLoai().trim().isEmpty()) {
+            loai.setMaLoai(sinhMaLoaiSanPhamMoi());
+        }
+
         String sql = "INSERT INTO LoaiSanPham (maLoai, tenLoai, moTa) VALUES (?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setString(1, loai.getMaLoai());
             ps.setString(2, loai.getTenLoai());
             ps.setString(3, loai.getMoTa());
+
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -51,7 +57,7 @@ public class LoaiSanPhamDAO implements ILoaiSanPhamDAO {
 
             ps.setString(1, loai.getTenLoai());
             ps.setString(2, loai.getMoTa());
-            ps.setString(3, loai.getMaLoai()); // Mã loại để ở cuối cùng ứng với dấu ? thứ 3
+            ps.setString(3, loai.getMaLoai());
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -68,7 +74,6 @@ public class LoaiSanPhamDAO implements ILoaiSanPhamDAO {
 
             ps.setString(1, maLoai);
 
-            // Lồng thêm try-with-resources cho ResultSet để tự động đóng
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     LoaiSanPham loai = new LoaiSanPham();
@@ -81,23 +86,54 @@ public class LoaiSanPhamDAO implements ILoaiSanPhamDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null; // Trả về null nếu không tìm thấy
+        return null;
     }
+    public String sinhMaLoaiSanPhamMoi(){
+        String sql = "SELECT MAX(CAST(SUBSTRING(maLoai, 2, LEN(maLoai)) AS INT)) FROM LoaiSanPham";
 
-    @Override
-    public boolean xoa(String maLoai) {
-        String sql = "DELETE FROM LoaiSanPham WHERE maLoai = ?";
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+             Statement st = conn.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
 
-            ps.setString(1, maLoai);
-            return ps.executeUpdate() > 0;
-
+            if (rs.next() && rs.getObject(1) != null) {
+                int max = rs.getInt(1);
+                // Tạo format L kèm 2 chữ số (VD: L01, L02, L10)
+                return String.format("L%02d", max + 1);
+            }
         } catch (SQLException e) {
-            // Thêm dòng thông báo để nhóm dễ debug nếu vướng khóa ngoại
-            System.err.println("Lỗi XÓA: Có thể loại sản phẩm '" + maLoai + "' đang chứa sản phẩm bên trong!");
             e.printStackTrace();
         }
-        return false;
+
+
+        return "L01";
+    }
+    @Override
+    public int xoa(String maLoai) {
+        String sqlCheck = "SELECT COUNT(*) FROM SanPham WHERE maLoai = ?";
+
+        try (Connection conn = DBConnection.getConnection()) {
+
+            try (PreparedStatement psCheck = conn.prepareStatement(sqlCheck)) {
+                psCheck.setString(1, maLoai);
+                try (ResultSet rs = psCheck.executeQuery()) {
+                    if (rs.next() && rs.getInt(1) > 0) {
+                        return 2; // TRƯỜNG HỢP 2: Đang có sản phẩm -> Không được xóa
+                    }
+                }
+            }
+
+            // 2. Nếu không vướng sản phẩm nào, tiến hành Xóa cứng
+            String sqlDelete = "DELETE FROM LoaiSanPham WHERE maLoai = ?";
+            try (PreparedStatement psDelete = conn.prepareStatement(sqlDelete)) {
+                psDelete.setString(1, maLoai);
+                if (psDelete.executeUpdate() > 0) {
+                    return 1; // TRƯỜNG HỢP 1: Xóa thành công
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 }
