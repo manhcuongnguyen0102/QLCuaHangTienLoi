@@ -1,7 +1,7 @@
 package model;
 
 public class ChiTietPhieuNhap {
-    private String maChiTiet;
+    private int maChiTiet;
     private String maPhieuNhap;
     private String maSanPham;
     private int soLuong;
@@ -10,7 +10,7 @@ public class ChiTietPhieuNhap {
     public ChiTietPhieuNhap() {
     }
 
-    public ChiTietPhieuNhap(double giaNhap, String maChiTiet, String maPhieuNhap, String maSanPham, int soLuong) {
+    public ChiTietPhieuNhap(double giaNhap, int maChiTiet, String maPhieuNhap, String maSanPham, int soLuong) {
         this.giaNhap = giaNhap;
         this.maChiTiet = maChiTiet;
         this.maPhieuNhap = maPhieuNhap;
@@ -26,11 +26,11 @@ public class ChiTietPhieuNhap {
         this.giaNhap = giaNhap;
     }
 
-    public String getMaChiTiet() {
+    public int getMaChiTiet() {
         return maChiTiet;
     }
 
-    public void setMaChiTiet(String maChiTiet) {
+    public void setMaChiTiet(int maChiTiet) {
         this.maChiTiet = maChiTiet;
     }
 

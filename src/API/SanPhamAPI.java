@@ -43,16 +43,22 @@ public class SanPhamAPI extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         setHeader(resp);
         PrintWriter out = resp.getWriter();
+        JsonObject jsonResponse = new JsonObject();
 
         try {
             List<SanPham> ds = dao.layTatCa();
-            // Gson sẽ tự động biến List thành chuỗi JSON chuẩn
-            out.print(gson.toJson(ds));
+            resp.setStatus(HttpServletResponse.SC_OK);
+            jsonResponse.addProperty("status", "success");
+            jsonResponse.add("data", gson.toJsonTree(ds));
+
+
         } catch (Exception e) {
             e.printStackTrace();
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.print("{\"status\":\"error\", \"message\":\"Lỗi lấy danh sách sản phẩm\"}");
+            jsonResponse.addProperty("status", "error");
+            jsonResponse.addProperty("message", "Lỗi lấy danh sách sản phẩm");
         }
+        out.print(toString());
     }
 
     // POST: Thêm sản phẩm mới

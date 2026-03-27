@@ -13,61 +13,90 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-@WebServlet("/API/PhieuNhapAPI")
+
+@WebServlet("/API/PhieuNhapAPI/*")
 public class PhieuNhapAPI extends HttpServlet {
     private PhieuNhapDAO dao = new PhieuNhapDAO();
     private Gson gson = new Gson();
-    // ================= SỬA generateMaPN =================
-    private String generateMaPN() {
-        int max = dao.getMaxMaPN(); // gọi DAO
-        return String.format("PN%03d", max + 1);
-    }
-    @Override
-    protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+
+
+    private void setHeader(HttpServletResponse resp) {
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
         resp.setHeader("Access-Control-Allow-Origin", "*");
         resp.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
         resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    }
+
+    private String generateMaPN() {
+        return dao.sinhMaPhieuNhapMoi();
+    }
+
+    @Override
+    protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        setHeader(resp);
         resp.setStatus(HttpServletResponse.SC_OK);
     }
+
+
+    // GET: LẤY DANH SÁCH HOẶC LẤY CHI TIẾT 1 PHIẾU
+
     @Override
-    // GET (Lịch sử phiếu nhập)
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        request.setCharacterEncoding("UTF-8");
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        response.setHeader("Access-Control-Allow-Origin", "*");
-
+        setHeader(response);
         JsonObject json = new JsonObject();
-        try {
-            var list = dao.layDanhSachPhieuNhap();
-            response.setStatus(HttpServletResponse.SC_OK);
-            json.addProperty("status", "success");
-            json.add("data", gson.toJsonTree(list));
 
+        try {
+            String maPhieuNhap = request.getParameter("maPhieuNhap");
+
+            if (maPhieuNhap != null && !maPhieuNhap.trim().isEmpty()) {
+                // TÍNH NĂNG MỚI: Lấy thông tin 1 Phiếu + Danh sách chi tiết của nó
+                // (Bạn cần viết thêm hàm layChiTietPhieuNhap(maPN) trong DAO)
+                PhieuNhap pn = dao.timTheoMa(maPhieuNhap);
+                if (pn != null) {
+                    List<ChiTietPhieuNhap> chiTiet = dao.layChiTietCuaPhieu(maPhieuNhap);
+
+                    JsonObject dataObj = gson.toJsonTree(pn).getAsJsonObject();
+                    dataObj.add("danhSachChiTiet", gson.toJsonTree(chiTiet)); // Nhét mảng chi tiết vào trong Object Phiếu Nhập
+
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    json.addProperty("status", "success");
+                    json.add("data", dataObj);
+                } else {
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    json.addProperty("status", "error");
+                    json.addProperty("message", "Không tìm thấy phiếu nhập!");
+                }
+            } else {
+                // Lấy toàn bộ danh sách Phiếu Nhập (Header)
+                var list = dao.layTatCa();
+                response.setStatus(HttpServletResponse.SC_OK);
+                json.addProperty("status", "success");
+                json.add("data", gson.toJsonTree(list));
+            }
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             json.addProperty("status", "error");
             json.addProperty("message", "Lỗi server: " + e.getMessage());
             e.printStackTrace();
         }
-
         response.getWriter().print(json.toString());
     }
-    // POST (Transaction)
+
+    // ==========================================
+    // POST: TẠO PHIẾU NHẬP (TRANSACTION)
+    // ==========================================
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        // 1. Nhận tiếng Việt từ Postman
         request.setCharacterEncoding("UTF-8");
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        response.setHeader("Access-Control-Allow-Origin", "*");
-
+        setHeader(response);
         JsonObject json = new JsonObject();
 
         try {
             BufferedReader reader = request.getReader();
-            // Đọc JSON vào class DTO nội bộ ở cuối file
             PhieuNhapRequest reqData = gson.fromJson(reader, PhieuNhapRequest.class);
+
+            // Validate DTO
             if (reqData == null || reqData.getChiTiet() == null || reqData.getChiTiet().isEmpty()) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 json.addProperty("status", "error");
@@ -98,11 +127,14 @@ public class PhieuNhapAPI extends HttpServlet {
                     return;
                 }
             }
+
+
             PhieuNhap pn = new PhieuNhap();
             pn.setMaPhieuNhap(generateMaPN());
             pn.setNgayNhap(new Timestamp(System.currentTimeMillis()));
             pn.setMaNhanVien(reqData.getMaNhanVien());
             pn.setMaNCC(reqData.getMaNCC());
+
 
             List<ChiTietPhieuNhap> dsChiTiet = new ArrayList<>();
             for (ChiTietRequest item : reqData.getChiTiet()) {
@@ -114,10 +146,11 @@ public class PhieuNhapAPI extends HttpServlet {
                 dsChiTiet.add(ct);
             }
 
+
             boolean success = dao.taoPhieuNhap(pn, dsChiTiet);
 
             if (success) {
-                response.setStatus(HttpServletResponse.SC_OK);
+                response.setStatus(HttpServletResponse.SC_CREATED); // Đã sửa thành 201 Created
                 json.addProperty("status", "success");
                 json.addProperty("message", "Tạo phiếu nhập và cập nhật kho thành công!");
                 json.addProperty("maPN", pn.getMaPhieuNhap());
@@ -130,13 +163,13 @@ public class PhieuNhapAPI extends HttpServlet {
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             json.addProperty("status", "error");
-            json.addProperty("message", "Lỗi server: " + e.getMessage());
+            json.addProperty("message", "Lỗi định dạng dữ liệu: " + e.getMessage());
             e.printStackTrace();
         }
         response.getWriter().print(json.toString());
     }
 
-    //CÁC CLASS NỘI BỘ DÙNG ĐỂ GSON ĐỌC JSON (DTO)
+
     private class PhieuNhapRequest {
         private String maNCC;
         private String maNhanVien;

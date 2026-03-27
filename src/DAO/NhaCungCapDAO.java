@@ -1,5 +1,6 @@
 package DAO;
 
+import API.NhaCungCapAPI;
 import DaoInterFace.DBConnection;
 import DaoInterFace.INhaCungCapDAO;
 import model.NhaCungCap;
@@ -66,6 +67,29 @@ public class NhaCungCapDAO implements INhaCungCapDAO {
         }
         return null;
     }
+    public List<NhaCungCap> timTheoTen(String tenNCC){
+        List<NhaCungCap> list= new ArrayList<>();
+        String sql="Select * from NhaCungCap where tenNCC LIKE ?";
+        try(Connection conn= DBConnection.getConnection();
+            PreparedStatement ps= conn.prepareStatement(sql)){
+            ps.setString(1,tenNCC);
+            try(ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    NhaCungCap ncc = new NhaCungCap();
+                    ncc.setMaNCC(rs.getString("maNCC"));
+                    ncc.setTenNCC(rs.getString("tenNCC"));
+                    ncc.setDiaChi(rs.getString("diaChi"));
+                    ncc.setSoDienThoai(rs.getString("soDienThoai"));
+                    list.add(ncc);
+                }
+            }
+            }catch (SQLException e){
+                e.printStackTrace();
+            }
+
+        return  list;
+
+    }
 
     @Override
     public boolean capNhat(NhaCungCap ncc) {
@@ -84,16 +108,59 @@ public class NhaCungCapDAO implements INhaCungCapDAO {
     }
 
     @Override
-    public boolean xoa(String maNCC) {
-        String sql = "DELETE FROM NhaCungCap WHERE maNCC = ?";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, maNCC);
-            return ps.executeUpdate() > 0;
+    public int xoa(String maNCC) {
+        String sqlCheckSP = "SELECT COUNT(*) FROM SanPham WHERE maNCC = ?";
+
+        // (Nếu DB của bạn đã có bảng PhieuNhap, nên check thêm cả PhieuNhap nữa cho chắc ăn)
+        String sqlCheckPN = "SELECT COUNT(*) FROM PhieuNhap WHERE maNCC = ?";
+
+        try (Connection conn = DBConnection.getConnection()) {
+
+            // Check Sản Phẩm
+            try (PreparedStatement psCheck = conn.prepareStatement(sqlCheckSP)) {
+                psCheck.setString(1, maNCC);
+                try (ResultSet rs = psCheck.executeQuery()) {
+                    if (rs.next() && rs.getInt(1) > 0) return 2; // Đang có sản phẩm -> Chặn
+                }
+            }
+
+            // Check Phiếu Nhập (Tùy chọn, bảo vệ dữ liệu tuyệt đối)
+            try (PreparedStatement psCheck2 = conn.prepareStatement(sqlCheckPN)) {
+                psCheck2.setString(1, maNCC);
+                try (ResultSet rs2 = psCheck2.executeQuery()) {
+                    if (rs2.next() && rs2.getInt(1) > 0) return 2; // Đã từng nhập hàng -> Chặn
+                }
+            }
+
+            // BƯỚC 2: Vượt qua các bài test thì Xóa cứng
+            String sqlDelete = "DELETE FROM NhaCungCap WHERE maNCC = ?";
+            try (PreparedStatement psDelete = conn.prepareStatement(sqlDelete)) {
+                psDelete.setString(1, maNCC);
+                if (psDelete.executeUpdate() > 0) {
+                    return 1; // Xóa thành công
+                }
+            }
+
         } catch (SQLException e) {
-            System.err.println("Lỗi XÓA: Nhà cung cấp '" + maNCC + "' có thể đang gắn với các Phiếu Nhập trong kho!");
             e.printStackTrace();
         }
-        return false;
+        return 0; // Lỗi hệ thống hoặc mã sai
+    }
+
+    public String sinhMaNCCMoi() {
+        // Mã là NCC01 -> Cắt từ vị trí thứ 4 trở đi để lấy phần số
+        String sql = "SELECT MAX(CAST(SUBSTRING(maNCC, 4, LEN(maNCC)) AS INT)) FROM NhaCungCap";
+        try (Connection conn = DBConnection.getConnection();
+             Statement st = conn.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+
+            if (rs.next() && rs.getObject(1) != null) {
+                int max = rs.getInt(1);
+                return String.format("NCC%02d", max + 1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "NCC01"; // Nếu bảng rỗng, trả về mã đầu tiên
     }
 }

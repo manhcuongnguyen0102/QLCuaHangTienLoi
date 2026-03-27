@@ -1,7 +1,7 @@
 package model;
 
 public class ChiTietHoaDon {
-    private String maChiTiet;
+    private int maChiTiet;
     private String maHoaDon;
     private String maSanPham;
     private int soLuong;
@@ -10,7 +10,7 @@ public class ChiTietHoaDon {
     public ChiTietHoaDon() {
     }
 
-    public ChiTietHoaDon(double giaBan, String maChiTiet, String maHoaDon, String maSanPham, int soLuong) {
+    public ChiTietHoaDon(double giaBan, int maChiTiet, String maHoaDon, String maSanPham, int soLuong) {
         this.giaBan = giaBan;
         this.maChiTiet = maChiTiet;
         this.maHoaDon = maHoaDon;
@@ -26,11 +26,11 @@ public class ChiTietHoaDon {
         this.giaBan = giaBan;
     }
 
-    public String getMaChiTiet() {
+    public int getMaChiTiet() {
         return maChiTiet;
     }
 
-    public void setMaChiTiet(String maChiTiet) {
+    public void setMaChiTiet(int maChiTiet) {
         this.maChiTiet = maChiTiet;
     }
 
