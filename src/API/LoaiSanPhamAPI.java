@@ -39,9 +39,11 @@ public class LoaiSanPhamAPI extends HttpServlet {
 
     // GET: Lấy danh sách Loại
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         setHeader(response);
         PrintWriter out = response.getWriter();
+        JsonObject json = new JsonObject();
         try {
             String maLoai = request.getParameter("maLoai");
 
@@ -49,7 +51,9 @@ public class LoaiSanPhamAPI extends HttpServlet {
                 // Trường hợp 1: Có truyền mã -> Trả về 1 đối tượng
                 LoaiSanPham loai = dao.timTheoMa(maLoai); // (Hàm này bạn đã viết trong DAO rồi)
                 if (loai != null) {
-                    out.print(gson.toJson(loai));
+                    json.addProperty("status", "success");
+                    json.add("data", gson.toJsonTree(loai));
+                    out.print(json.toString());
                 } else {
                     response.setStatus(HttpServletResponse.SC_NOT_FOUND); // Lỗi 404
                     out.print("{\"status\":\"error\", \"message\":\"Không tìm thấy loại sản phẩm!\"}");
@@ -57,7 +61,9 @@ public class LoaiSanPhamAPI extends HttpServlet {
             } else {
                 // Trường hợp 2: Không truyền mã -> Trả về danh sách (Như cũ)
                 List<LoaiSanPham> list = dao.layTatCa();
-                out.print(gson.toJson(list));
+                json.addProperty("status", "success");
+                json.add("data", gson.toJsonTree(list));
+                out.print(json.toString());
             }
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -65,10 +71,10 @@ public class LoaiSanPhamAPI extends HttpServlet {
         }
     }
 
-
     // POST: Thêm Loại mới
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         setHeader(response);
         PrintWriter out = response.getWriter();
@@ -107,7 +113,8 @@ public class LoaiSanPhamAPI extends HttpServlet {
 
     // PUT: Cập nhật Loại
     @Override
-    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPut(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         setHeader(response);
         PrintWriter out = response.getWriter();
@@ -143,7 +150,8 @@ public class LoaiSanPhamAPI extends HttpServlet {
 
     // DELETE: Xóa Loại
     @Override
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         setHeader(response);
         PrintWriter out = response.getWriter();
         JsonObject jsonResponse = new JsonObject();

@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-@WebServlet("/API/KhachHangAPI")
+@WebServlet("/API/KhachHangAPI/*")
 public class KhachHangAPI  extends HttpServlet{
     private KhachHangDAO dao = new KhachHangDAO();
     private Gson gson = new Gson();

@@ -63,26 +63,58 @@ public class NhanVienDAO implements INhanVienDAO {
         return null;
 
     }
-
     @Override
-    public boolean them(NhanVien nv) {
-        String sql = "INSERT INTO NhanVien (maNhanVien, tenNhanVien, chucVu, soDienThoai, tenDangNhap) VALUES (?,?,?,?,?)";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+    public boolean them(NhanVien nv, String matKhauMacDinh) {
+        // Bước 1: SQL linh hoạt hơn
+        String sqlTK = "INSERT INTO TaiKhoan (tenDangNhap, matKhau, vaiTro, trangThai) VALUES (?, ?, ?, 1)";
+        String sqlNV = "INSERT INTO NhanVien (maNhanVien, tenNhanVien, chucVu, soDienThoai, tenDangNhap) VALUES (?, ?, ?, ?, ?)";
 
-            ps.setString(1, nv.getMaNhanVien());
-            ps.setString(2, nv.getTenNhanVien());
-            ps.setString(3, nv.getChucVu());
-            ps.setString(4, nv.getSoDienThoai());
-            ps.setString(5, nv.getTenDangNhap());
-            return ps.executeUpdate() > 0;
+        Connection conn = null;
+        try {
+            conn = DBConnection.getConnection();
+            conn.setAutoCommit(false);
+
+            // [MỚI] Xác định vai trò dựa trên chức vụ
+            String vaiTro = "STAFF"; // Mặc định
+            if (nv.getChucVu() != null && nv.getChucVu().equalsIgnoreCase("Quản lý")) {
+                vaiTro = "QUAN_LY";
+            }
+
+            // BƯỚC 1: Tạo tài khoản với vai trò động
+            try (PreparedStatement psTK = conn.prepareStatement(sqlTK)) {
+                psTK.setString(1, nv.getTenDangNhap());
+                psTK.setString(2, matKhauMacDinh);
+                psTK.setString(3, vaiTro); // Truyền vai trò đã được xác định ở trên
+                psTK.executeUpdate();
+            }
+
+            // BƯỚC 2: Sinh mã mới
+            String maMoi = sinhMaNhanVien(conn);
+
+            // BƯỚC 3: Lưu thông tin nhân viên
+            try (PreparedStatement psNV = conn.prepareStatement(sqlNV)) {
+                psNV.setString(1, maMoi);
+                psNV.setString(2, nv.getTenNhanVien());
+                psNV.setString(3, nv.getChucVu());
+                psNV.setString(4, nv.getSoDienThoai());
+                psNV.setString(5, nv.getTenDangNhap());
+                psNV.executeUpdate();
+            }
+
+            conn.commit();
+            return true;
 
         } catch (SQLException e) {
-            System.err.println("Lỗi Thêm: Mã nhân viên hoặc Tên đăng nhập bị trùng, hoặc tên đăng nhập chưa có trong bảng TaiKhoan!");
+            if (conn != null) {
+                try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+            }
             e.printStackTrace();
+        } finally {
+            try { if(conn != null) { conn.setAutoCommit(true); conn.close(); } } catch (Exception e) {}
         }
         return false;
     }
+
 
     @Override
     public boolean sua(NhanVien nv) {
@@ -121,26 +153,28 @@ public class NhanVienDAO implements INhanVienDAO {
         return false;
     }
 
-    public String sinhMaNhanVien() {
-        int max = 0;
-        String sql = "select maNhanVien from NhanVien";
-        try (Connection conn = DBConnection.getConnection();
-             Statement st = conn.createStatement();
-             ResultSet rs = st.executeQuery(sql)) {
-            while (rs.next()) {
-                String ma = rs.getString("maNhanVien");
-                if (ma != null && ma.startsWith("NV")) {
-                    try {
-                        int so = Integer.parseInt(ma.substring(2));
-                        if (so > max) max = so;
-                    } catch (NumberFormatException ignored) {
-                    }
-                }
+    public String sinhMaNhanVien(Connection conn) {
+        // Dùng SQL Server lấy ngay cái mã lớn nhất ra (Ví dụ: NV015)
+        // Lấy đúng 1 dòng (TOP 1) và sắp xếp giảm dần (ORDER BY DESC)
+        String sql = "SELECT TOP 1 maNhanVien FROM NhanVien ORDER BY maNhanVien DESC";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+                String maCu = rs.getString("maNhanVien");
+                // Cắt chữ NV (từ vị trí số 2) rồi ép sang số
+                int max = Integer.parseInt(maCu.substring(2));
+                return String.format("NV%03d", max + 1);
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } catch (NumberFormatException e) {
+            System.err.println("Lỗi parse số khi sinh mã nhân viên!");
         }
-        return String.format("NV%03d", max + 1);
+
+        // Nếu bảng trống chưa có ai, trả về nhân viên đầu tiên
+        return "NV001";
     }
 
 }

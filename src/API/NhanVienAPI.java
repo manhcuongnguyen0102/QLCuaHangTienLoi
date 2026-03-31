@@ -34,7 +34,8 @@ public class NhanVienAPI extends HttpServlet {
         resp.setStatus(HttpServletResponse.SC_OK);
     }
 
-    // GET: Lấy danh sách nhân viên
+
+    // GET
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("application/json");
@@ -45,10 +46,41 @@ public class NhanVienAPI extends HttpServlet {
 
         try {
             List<NhanVien> ds = nvDAO.layTatCa();
+
+
+            com.google.gson.JsonArray jsonArray = new com.google.gson.JsonArray();
+
+            for (NhanVien nv : ds) {
+
+                JsonObject obj = gson.toJsonTree(nv).getAsJsonObject();
+
+
+                boolean trangThai = true; // Mặc định là đang làm
+                String sql = "SELECT trangThai FROM TaiKhoan WHERE tenDangNhap = ?";
+                try (Connection conn = DBConnection.getConnection();
+                     PreparedStatement ps = conn.prepareStatement(sql)) {
+                    ps.setString(1, nv.getTenDangNhap());
+                    try (java.sql.ResultSet rs = ps.executeQuery()) {
+                        if (rs.next()) {
+                            trangThai = rs.getBoolean("trangThai");
+                        }
+                    }
+                }
+
+
+                obj.addProperty("trangThai", trangThai);
+
+
+                jsonArray.add(obj);
+            }
+
             jsonResponse.addProperty("status", "success");
             jsonResponse.addProperty("message", "Lấy danh sách nhân viên thành công!");
-            jsonResponse.add("data", gson.toJsonTree(ds));
+
+
+            jsonResponse.add("data", jsonArray);
             resp.setStatus(HttpServletResponse.SC_OK);
+
         } catch (Exception e) {
             e.printStackTrace();
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -61,9 +93,14 @@ public class NhanVienAPI extends HttpServlet {
         }
     }
 
-    // POST: Thêm nhân viên mới (giống luồng Register)
+
+
+    // POST: Thêm nhân viên mới
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        req.setCharacterEncoding("UTF-8");
+
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
         resp.setHeader("Access-Control-Allow-Origin", "*");
@@ -74,6 +111,7 @@ public class NhanVienAPI extends HttpServlet {
             BufferedReader reader = req.getReader();
             NhanVienRequest nvReq = gson.fromJson(reader, NhanVienRequest.class);
 
+            // Kiểm tra dữ liệu đầu vào
             if (nvReq == null || nvReq.getTenNhanVien() == null || nvReq.getTenDangNhap() == null || nvReq.getMatKhau() == null) {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 jsonResponse.addProperty("status", "error");
@@ -91,55 +129,33 @@ public class NhanVienAPI extends HttpServlet {
                 return;
             }
 
-            Connection conn = null;
-            try {
-                conn = DBConnection.getConnection();
-                conn.setAutoCommit(false);
+            // ========================================================
+            // ĐẨY HẾT VIỆC NẶNG CHO DAO XỬ LÝ
+            // ========================================================
+            NhanVien nvMoi = new NhanVien();
+            nvMoi.setTenNhanVien(nvReq.getTenNhanVien());
+            nvMoi.setChucVu(nvReq.getChucVu() != null ? nvReq.getChucVu() : "Nhân viên bán hàng");
+            nvMoi.setSoDienThoai(nvReq.getSoDienThoai());
+            nvMoi.setTenDangNhap(nvReq.getTenDangNhap());
 
-                // 1. Tạo tài khoản với vai trò STAFF
-                String sqlTK = "INSERT INTO TaiKhoan (tenDangNhap, matKhau, vaiTro, trangThai) VALUES (?, ?, 'STAFF', 1)";
-                try (PreparedStatement psTK = conn.prepareStatement(sqlTK)) {
-                    psTK.setString(1, nvReq.getTenDangNhap());
-                    psTK.setString(2, nvReq.getMatKhau());
-                    psTK.executeUpdate();
-                }
+            // Gọi siêu hàm Transaction bên DAO
+            boolean isAdded = nvDAO.them(nvMoi, nvReq.getMatKhau());
 
-                // 2. Sinh mã nhân viên mới
-                String maMoi = nvDAO.sinhMaNhanVien();
-
-                // 3. Thêm nhân viên
-                String sqlNV = "INSERT INTO NhanVien (maNhanVien, tenNhanVien, chucVu, soDienThoai, tenDangNhap) VALUES (?, ?, ?, ?, ?)";
-                try (PreparedStatement psNV = conn.prepareStatement(sqlNV)) {
-                    psNV.setString(1, maMoi);
-                    psNV.setString(2, nvReq.getTenNhanVien());
-                    psNV.setString(3, nvReq.getChucVu() != null ? nvReq.getChucVu() : "Nhân viên bán hàng");
-                    psNV.setString(4, nvReq.getSoDienThoai());
-                    psNV.setString(5, nvReq.getTenDangNhap());
-                    psNV.executeUpdate();
-                }
-
-                conn.commit();
-
-                // Trả về dữ liệu nhân viên vừa thêm
-                NhanVien nv = nvDAO.timTheoMa(maMoi);
+            if (isAdded) {
                 jsonResponse.addProperty("status", "success");
                 jsonResponse.addProperty("message", "Thêm nhân viên thành công!");
-                jsonResponse.add("data", gson.toJsonTree(nv));
                 resp.setStatus(HttpServletResponse.SC_OK);
-            } catch (SQLException e) {
-                if (conn != null) try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
-                e.printStackTrace();
+            } else {
                 resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 jsonResponse.addProperty("status", "error");
-                jsonResponse.addProperty("message", "Lỗi khi thêm nhân viên: " + e.getMessage());
-            } finally {
-                if (conn != null) try { conn.setAutoCommit(true); conn.close(); } catch (SQLException e) { e.printStackTrace(); }
+                jsonResponse.addProperty("message", "Lỗi lưu vào CSDL (Có thể do lỗi hệ thống)!");
             }
+
         } catch (Exception e) {
             e.printStackTrace();
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             jsonResponse.addProperty("status", "error");
-            jsonResponse.addProperty("message", "Lỗi server: " + e.getMessage());
+            jsonResponse.addProperty("message", "Dữ liệu gửi lên sai định dạng!");
         } finally {
             out.print(jsonResponse.toString());
             out.flush();
@@ -150,8 +166,10 @@ public class NhanVienAPI extends HttpServlet {
     // PUT: Cập nhật thông tin nhân viên
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
+        resp.setContentType("application/json");
+
+
         resp.setHeader("Access-Control-Allow-Origin", "*");
         PrintWriter out = resp.getWriter();
         JsonObject jsonResponse = new JsonObject();

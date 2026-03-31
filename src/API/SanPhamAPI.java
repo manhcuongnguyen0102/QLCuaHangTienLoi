@@ -58,7 +58,7 @@ public class SanPhamAPI extends HttpServlet {
             jsonResponse.addProperty("status", "error");
             jsonResponse.addProperty("message", "Lỗi lấy danh sách sản phẩm");
         }
-        out.print(toString());
+        resp.getWriter().print(jsonResponse.toString());
     }
 
     // POST: Thêm sản phẩm mới
@@ -91,7 +91,7 @@ public class SanPhamAPI extends HttpServlet {
                 jsonResponse.addProperty("message", "Thiếu mã Loại hoặc mã Nhà cung cấp!");
             }
             else {
-                // Gọi DAO (Hàm them() của bạn đã có logic tự gọi sinhMaSanPhamMoi() rồi)
+                sp.setSoLuongTon(0);// Gọi DAO (Hàm them() của bạn đã có logic tự gọi sinhMaSanPhamMoi() rồi)
                 if (dao.them(sp)) {
                     jsonResponse.addProperty("status", "success");
                     jsonResponse.addProperty("message", "Thêm sản phẩm thành công!");

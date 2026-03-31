@@ -52,6 +52,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (ketQua.status === 200) {
                 // Thành công
                 showMessage("Đăng nhập thành công! Đang chuyển hướng...", false);
+                console.log("Dữ liệu từ Java gửi về là: ", ketQua.body.data);
                 
                 // Lưu dữ liệu để dùng cho các trang sau
                 localStorage.setItem('user_info', JSON.stringify(ketQua.body.data));

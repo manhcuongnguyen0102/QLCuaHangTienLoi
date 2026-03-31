@@ -6,7 +6,7 @@ import model.NhanVien;
 public interface INhanVienDAO {
     List<NhanVien> layTatCa();
     NhanVien timTheoMa(String maNV);
-    boolean them(NhanVien nv);
+    public boolean them(NhanVien nv, String matKhauMacDinh);
     boolean sua(NhanVien nv);
     boolean xoa(String maNV);
 }

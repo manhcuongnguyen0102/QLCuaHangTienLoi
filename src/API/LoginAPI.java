@@ -53,7 +53,7 @@ public class LoginAPI extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST); // Mã lỗi 400
                 jsonResponse.addProperty("status", "error");
                 jsonResponse.addProperty("message", "Thiếu tên đăng nhập hoặc mật khẩu!");
-                out.print(jsonResponse.toString());
+                //out.print(jsonResponse.toString());
                 return;
             }
 

@@ -120,7 +120,7 @@ public class PhieuNhapDAO implements IPhieuNhapDAO {
 
         try (Connection conn = DBConnection.getConnection();
              Statement st = conn.createStatement();
-             ResultSet rs = st.executeQuery(sql);) {
+             ResultSet rs = st.executeQuery(sql)) {
 
             while (rs.next()) {
                 PhieuNhap pn = new PhieuNhap();

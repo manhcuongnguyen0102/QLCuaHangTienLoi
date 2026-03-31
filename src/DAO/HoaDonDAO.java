@@ -84,7 +84,7 @@ public class HoaDonDAO implements IHoaDonDAO {
             psHD.executeUpdate();
 
             // INSERT CHI TIẾT & TRỪ KHO THEO BATCH
-            String sqlCTHD = "INSERT INTO ChiTietHoaDon (maHoaDon, maSanPham, soLuong, giaBan) VALUES (?, ?, ?, ?)";
+            String sqlCTHD = "INSERT INTO ChiTietHoaDon (maHoaDon, maSanPham, soLu  ong, giaBan) VALUES (?, ?, ?, ?)";
             String sqlCapNhatKho = "UPDATE SanPham SET soLuongTon = soLuongTon - ? WHERE maSanPham = ?";
 
             psCTHD = conn.prepareStatement(sqlCTHD);
