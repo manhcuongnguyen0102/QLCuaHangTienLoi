@@ -14,10 +14,14 @@ function kiemTraDangNhap() {
     let user = JSON.parse(userStr);
 
     // 2. LÀ KHÁCH HÀNG -> Đá sang trang mua sắm ngay lập tức
+        // 2. LÀ KHÁCH HÀNG -> Đá sang trang mua sắm ngay lập tức
     if (user.vaiTro === "CUSTOMER") {
-        window.location.href = "trang-mua-sam.html"; 
+        if (!window.location.pathname.includes("trang-mua-sam.html") && !window.location.pathname.endsWith("/")) {
+            window.location.href = "trang-mua-sam.html"; 
+        }
         return;
     }
+
 
     // 3. LÀ QUẢN LÝ / NHÂN VIÊN -> Cho phép ở lại và hiển thị Tên
     let lblTen = document.getElementById("lblTenNhanVien");
