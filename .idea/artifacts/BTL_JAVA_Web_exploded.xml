@@ -1,0 +1,18 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="BTL_JAVA:Web exploded">
+    <output-path>$PROJECT_DIR$/out/artifacts/BTL_JAVA_Web_exploded</output-path>
+    <root id="root">
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="BTL_JAVA" />
+        </element>
+        <element id="directory" name="lib">
+          <element id="library" level="project" name="gson-2.10.1" />
+          <element id="library" level="project" name="mssql-jdbc-13.2.1.jre11 (3)" />
+          <element id="file-copy" path="$PROJECT_DIR$/../../CSDL/sqljdbc_13.2/enu/jars/mssql-jdbc-13.2.1.jre11.jar" />
+        </element>
+      </element>
+      <element id="javaee-facet-resources" facet="BTL_JAVA/web/Web" />
+    </root>
+  </artifact>
+</component>

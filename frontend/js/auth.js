@@ -7,7 +7,10 @@ function kiemTraDangNhap() {
 
     // 1. CHƯA ĐĂNG NHẬP -> Mời ra trang Login
     if (!userStr) {
-        window.location.href = "login.html";
+        // Chỉ chuyển về login nếu đang KHÔNG ở trang login
+        if (!window.location.pathname.includes("login.html")) {
+            window.location.href = "login.html";
+        }
         return;
     }
 
@@ -16,8 +19,8 @@ function kiemTraDangNhap() {
     // 2. LÀ KHÁCH HÀNG -> Đá sang trang mua sắm ngay lập tức
         // 2. LÀ KHÁCH HÀNG -> Đá sang trang mua sắm ngay lập tức
     if (user.vaiTro === "CUSTOMER") {
-        if (!window.location.pathname.includes("trang-mua-sam.html") && !window.location.pathname.endsWith("/")) {
-            window.location.href = "trang-mua-sam.html"; 
+        if (!window.location.pathname.includes("mua-sap.html") && !window.location.pathname.endsWith("/")) {
+            window.location.href = "mua-sap.html";
         }
         return;
     }
