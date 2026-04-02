@@ -2,22 +2,30 @@ document.addEventListener("DOMContentLoaded", function() {
     kiemTraDangNhap();
 });
 
-function kiemTraDangNhap() {
+async function kiemTraDangNhap() {
     let userStr = localStorage.getItem("user_info");
 
     // 1. CHƯA ĐĂNG NHẬP -> Mời ra trang Login
     if (!userStr) {
-        window.location.href = "login.html";
+        // Chỉ chuyển về login nếu đang KHÔNG ở trang login
+        if (!window.location.pathname.includes("login.html")) {
+            window.location.href = "login.html";
+        }
         return;
     }
 
     let user = JSON.parse(userStr);
 
     // 2. LÀ KHÁCH HÀNG -> Đá sang trang mua sắm ngay lập tức
-        // 2. LÀ KHÁCH HÀNG -> Đá sang trang mua sắm ngay lập tức
     if (user.vaiTro === "CUSTOMER") {
-        if (!window.location.pathname.includes("trang-mua-sam.html") && !window.location.pathname.endsWith("/")) {
-            window.location.href = "trang-mua-sam.html"; 
+        // Lấy mã khách hàng nếu chưa có
+        if (!user.maKhachHang) {
+            await fetchThongTinKhachHang(user.tenDangNhap);
+            user = JSON.parse(localStorage.getItem("user_info"));
+        }
+
+        if (!window.location.pathname.includes("mua-sap.html") && !window.location.pathname.includes("gio-hang.html") && !window.location.pathname.endsWith("/")) {
+            window.location.href = "mua-sap.html";
         }
         return;
     }
@@ -26,7 +34,7 @@ function kiemTraDangNhap() {
     // 3. LÀ QUẢN LÝ / NHÂN VIÊN -> Cho phép ở lại và hiển thị Tên
     let lblTen = document.getElementById("lblTenNhanVien");
     if (lblTen) {
-        lblTen.innerText = user.tenDangNhap; 
+        lblTen.innerText = user.tenDangNhap;
     }
 
     // 4. PHÂN QUYỀN MENU (Tùy chọn)
@@ -44,7 +52,7 @@ function phanQuyenMenu(vaiTro) {
         if (menuThongKe) {
             menuThongKe.style.display = "none";
         }
-        
+
         // Nếu Nhân viên vào thẳng trang index.html bằng cách gõ URL, đuổi sang trang Đơn hàng
         if (window.location.pathname.includes("index.html")) {
             window.location.href = "quanlydonhang.html";
@@ -56,6 +64,25 @@ function phanQuyenMenu(vaiTro) {
 function dangXuat() {
     if (confirm("Bạn có chắc chắn muốn đăng xuất khỏi hệ thống?")) {
         localStorage.removeItem("user_info"); // Xé thẻ căn cước
+        localStorage.removeItem("shopping_cart");
         window.location.href = "login.html";  // Trở về nơi bắt đầu
+    }
+}
+
+async function fetchThongTinKhachHang(tenDangNhap) {
+    try {
+        const response = await fetch('http://localhost:8080/QuanLyCuaHangTienLoi/API/KhachHangAPI');
+        const data = await response.json();
+        if (data.status === "success") {
+            const khachHang = data.data.find(kh => kh.tenDangNhap === tenDangNhap);
+            if (khachHang) {
+                let user = JSON.parse(localStorage.getItem("user_info"));
+                user.maKhachHang = khachHang.maKhachHang;
+                user.tenKhachHang = khachHang.tenKhachHang;
+                localStorage.setItem("user_info", JSON.stringify(user));
+            }
+        }
+    } catch (error) {
+        console.error("Lỗi lấy thông tin khách hàng:", error);
     }
 }

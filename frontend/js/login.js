@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
         loginBtn.disabled = true;
 
         // 2. Cấu hình URL API (Giữ nguyên như cũ của bạn)
-        const urlAPI = 'http://localhost:8080/QuanLyCuaHangTienLoi/API/LoginAPI';
+        const urlAPI = 'http://localhost:8080/API/LoginAPI';
 
         // 3. Gọi Fetch API
         fetch(urlAPI, {
@@ -53,9 +53,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Thành công
                 showMessage("Đăng nhập thành công! Đang chuyển hướng...", false);
                 console.log("Dữ liệu từ Java gửi về là: ", ketQua.body.data);
-                
+
                 // Lưu dữ liệu để dùng cho các trang sau
-                localStorage.setItem('user_info', JSON.stringify(ketQua.body.data));
+                let userData = ketQua.body.data;
+                userData.selectedProducts = [];
+                localStorage.setItem('user_info', JSON.stringify(userData));
                 
                 // Đợi 1 giây rồi chuyển trang cho mượt
                 setTimeout(() => {

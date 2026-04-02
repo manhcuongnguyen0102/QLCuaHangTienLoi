@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cửa Hàng Tiện Lợi - Trang Mua Sắm</title>
+    <link rel="stylesheet" href="/frontend/css/mua-sap.css">
+    <script src="/frontend/js/auth.js"></script>
+    <script src="/frontend/js/mua-sap.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+<header class="main-header">
+    <div class="header-content container">
+        <div class="logo-area">
+            <i class="fas fa-store logo-icon"></i>
+            <span class="logo-text">Cửa Hàng Tiện Lợi</span>
+        </div>
+        <nav class="main-nav">
+            <a href="#" class="nav-item active">Trang Chủ</a>
+            <a href="#" class="nav-item">Sản Phẩm Mới</a>
+        </nav>
+        <div class="user-actions">
+            <div class="cart-btn">
+                <a href="gio-hang.html" class="cart-link">
+                    <i class="fas fa-shopping-cart"></i>Giỏ hàng
+                    <span class="cart-count">0</span>
+                </a>
+            </div>
+
+            <div class="user-dropdown">
+                <button class="user-btn">
+                    <i class="fas fa-user-circle"></i> <span id="user-name-display">khach01</span> <i class="fas fa-caret-down"></i>
+                </button>
+                <div class="dropdown-content" id="user-menu">
+                    <a href="#" id="staff-link" style="display:none;">Trang Quản Lý (NV)</a>
+                    <a href="#">Thông tin tài khoản</a>
+                    <a href="#" onclick="logout()">Đăng xuất</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="container">
+    <section class="banner-section">
+        <div class="banner-box">
+            <div class="banner-text">
+                <h1>Ưu đãi mùa hè rực rỡ!</h1>
+                <p>Mua sắm trực tuyến nhanh chóng, tiện lợi. Nhận ngay điểm thưởng cho mỗi đơn hàng.</p>
+            </div>
+            <div class="banner-icon-area">
+                <div class="tag-icon"></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="content-layout">
+        <aside class="sidebar">
+            <div class="category-box">
+                <i class="fas fa-list sidebar-icon"></i> Danh Mục Sản Phẩm
+                <div class="list-group mt-2" id="listLoaiSP">
+                    <p class="text-muted p-2">Đang tải...</p>
+                </div>
+            </div>
+        </aside>
+        <section class="product-grid-area" id="product-grid">
+        </section>
+    </section>
+</main>
+
+<div id="productDetailModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal-btn" onclick="closeProductModal()">&times;</span>
+
+        <div class="modal-body-layout">
+            <div class="modal-img-area" id="modal-img-container">
+                <div class="product-img-placeholder large"></div>
+            </div>
+
+            <div class="modal-info-area">
+                <h2 id="modal-product-name" class="modal-title">Tên Sản Phẩm</h2>
+                <p id="modal-product-code" class="modal-code">Mã SP: ...</p>
+                <p id="modal-product-price" class="modal-price">0 đ</p>
+
+                <div class="modal-stock-info">
+                    Trạng thái: <span id="modal-stock-status" class="stock-status">Đang kiểm tra...</span>
+                </div>
+
+                <div class="modal-purchase-controls">
+                    <label for="purchase-quantity">Số lượng:</label>
+                    <div class="quantity-input-group">
+                        <button type="button" class="qty-btn" onclick="adjustQuantity(-1)">-</button>
+                        <input type="number" id="purchase-quantity" value="1" min="1">
+                        <button type="button" class="qty-btn" onclick="adjustQuantity(1)">+</button>
+                    </div>
+                </div>
+
+                <p id="modal-error-msg" class="error-message" style="display: none;"></p>
+
+                <button id="add-to-cart-action-btn" class="modal-add-to-cart-btn" onclick="handleAddToCartFromModal()">
+                    <i class="fas fa-cart-plus"></i> Thêm vào giỏ hàng
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--<script src="../js/mua-sap.js"></script>-->
+</body>
+</html>
