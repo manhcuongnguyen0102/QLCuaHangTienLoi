@@ -19,8 +19,8 @@ function kiemTraDangNhap() {
     // 2. LÀ KHÁCH HÀNG -> Đá sang trang mua sắm ngay lập tức
         // 2. LÀ KHÁCH HÀNG -> Đá sang trang mua sắm ngay lập tức
     if (user.vaiTro === "CUSTOMER") {
-        if (!window.location.pathname.includes("mua-sap.html") && !window.location.pathname.endsWith("/")) {
-            window.location.href = "mua-sap.html";
+        if (!window.location.pathname.includes("trang-mua-sam.html") && !window.location.pathname.endsWith("/")) {
+            window.location.href = "trang-mua-sam.html";
         }
         return;
     }
