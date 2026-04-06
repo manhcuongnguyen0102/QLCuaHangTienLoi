@@ -9,4 +9,5 @@ public interface ILoaiSanPhamDAO {
     boolean capNhat(LoaiSanPham loai);
     LoaiSanPham timTheoMa(String maLoai);
     int xoa(String maLoai);
+    public String sinhMaLoaiSanPhamMoi();
 }

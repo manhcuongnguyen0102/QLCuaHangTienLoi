@@ -152,7 +152,7 @@ public class NhanVienDAO implements INhanVienDAO {
         }
         return false;
     }
-
+    @Override
     public String sinhMaNhanVien(Connection conn) {
         // Dùng SQL Server lấy ngay cái mã lớn nhất ra (Ví dụ: NV015)
         // Lấy đúng 1 dòng (TOP 1) và sắp xếp giảm dần (ORDER BY DESC)

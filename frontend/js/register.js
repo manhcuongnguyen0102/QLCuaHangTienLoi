@@ -3,7 +3,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const messageBox = document.getElementById('messageBox');
     const registerBtn = document.getElementById('registerBtn');
 
-    // Hàm hiển thị thông báo lỗi/thành công lên màn hình
+    /**
+     * Hàm hiển thị thông báo lỗi/thành công lên màn hình (Notification)
+     * @param {string} text - Thông điệp cần hiển thị
+     * @param {boolean} isError - Trạng thái màu sắc (Đỏ/Xanh)
+     */
     function showMessage(text, isError) {
         messageBox.style.display = 'block';
         messageBox.textContent = text;

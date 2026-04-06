@@ -1,3 +1,6 @@
+/* =========================================
+   1. CART CONTAINER & HEADER
+   ========================================= */
 .cart-container {
     max-width: 1200px;
     margin: 30px auto;
@@ -36,6 +39,9 @@
     min-width: 260px;
 }
 
+/* =========================================
+   2. CART TABLE & ITEMS
+   ========================================= */
 .cart-table {
     width: 100%;
     border-collapse: collapse;
@@ -77,6 +83,9 @@
     margin-top: 4px;
 }
 
+/* =========================================
+   3. QUANTITY CONTROL & ITEM BUTTONS
+   ========================================= */
 .quantity-control {
     display: flex;
     align-items: center;
@@ -122,6 +131,9 @@
     background-color: #c0392b;
 }
 
+/* =========================================
+   4. ORDER SUMMARY (BẢNG TÓM TẮT ĐƠN HÀNG)
+   ========================================= */
 .order-summary {
     background: #f9f9f9;
     padding: 20px;
@@ -170,6 +182,9 @@
     opacity: 0.6;
 }
 
+/* =========================================
+   5. EMPTY CART STATE (TRẠNG THÁI GIỎ HÀNG TRỐNG)
+   ========================================= */
 .empty-cart {
     text-align: center;
     padding: 60px;
@@ -187,6 +202,9 @@
     text-decoration: none;
 }
 
+/* =========================================
+   6. MISC COMPONENTS (TOOLBAR & CHECKBOX)
+   ========================================= */
 .cart-toolbar {
     margin-top: 15px;
     padding: 10px 0;
@@ -229,6 +247,9 @@
     text-align: right !important;
 }
 
+/* =========================================
+   7. RESPONSIVE DESIGN (CHO MOBILE)
+   ========================================= */
 @media (max-width: 768px) {
     .cart-layout {
         flex-direction: column;

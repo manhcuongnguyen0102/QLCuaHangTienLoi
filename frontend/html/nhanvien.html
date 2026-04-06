@@ -13,8 +13,8 @@
         <div class="logo-area"><i class="fas fa-store"></i><h3>Admin Panel</h3></div>
         <nav class="nav flex-column mb-auto" id="adminMenu">
             <a href="index.html" class="nav-link"><i class="fas fa-chart-pie"></i> Bảng Điều Khiển</a>
-            <a href="quanlydonhang.html" class="nav-link"><i class="fas fa-shopping-cart"></i> Đơn Hàng</a>
-            <a href="danhMucSP.html" class="nav-link"><i class="fas fa-box-open"></i> Sản Phẩm</a>
+            <a href="quanlydonhang.html" class="nav-link"><i class="fas fa-shopping-cart"></i>Quản Lý Đơn Hàng</a>
+            <a href="danhMucSP.html" class="nav-link"><i class="fas fa-box-open"></i> Danh Mục Sản Phẩm</a>
             <a href="nhapkho.html" class="nav-link"><i class="fas fa-truck-loading"></i> Nhập Kho</a>
             <a href="khachhang.html" class="nav-link"><i class="fas fa-users"></i> Khách Hàng</a>
             <a href="nhanvien.html" class="nav-link "><i class="fas fa-user-tie"></i> Quản Lý Nhân Viên</a>
@@ -36,7 +36,11 @@
             <h4 class="fw-bold text-dark"><i class="fas fa-user-shield"></i> Danh Sách Nhân Sự</h4>
             <button class="btn btn-primary" onclick="moFormThem()"><i class="fas fa-user-plus"></i> Thêm Nhân Viên Mới</button>
         </div>
-
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="search-box" style="width: 300px;">
+                <input type="text" id="searchInput" class="form-control" placeholder="Nhập từ khóa tìm kiếm...">
+            </div>
+        </div>
         <div class="dashboard-panel">
             <table class="table table-hover align-middle">
                 <thead class="table-light">
@@ -52,6 +56,8 @@
                 <tbody id="bangNhanVien">
                     </tbody>
             </table>
+            <div id="pagination-container" class="pagination-area mt-4 d-flex justify-content-end">
+            </div>
         </div>
     </div>
 

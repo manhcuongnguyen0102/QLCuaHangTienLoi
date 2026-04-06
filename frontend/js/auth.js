@@ -2,6 +2,12 @@ document.addEventListener("DOMContentLoaded", function() {
     kiemTraDangNhap();
 });
 
+/**
+ * Kiểm tra trạng thái đăng nhập và điều hướng user
+ * - Nếu không có dữ liệu: Đuổi ra trang Login
+ * - Nếu là KHACH_HANG: Khóa ở trang mua sắm/giỏ hàng
+ * - Nếu là ADMIN/NHAN_VIEN: Hiển thị tên & Phân quyền Menu quản lý
+ */
 function kiemTraDangNhap() {
     let userStr = localStorage.getItem("user_info");
 
@@ -17,10 +23,10 @@ function kiemTraDangNhap() {
     let user = JSON.parse(userStr);
 
     // 2. LÀ KHÁCH HÀNG -> Đá sang trang mua sắm ngay lập tức
-        // 2. LÀ KHÁCH HÀNG -> Đá sang trang mua sắm ngay lập tức
-    if (user.vaiTro === "CUSTOMER") {
-        if (!window.location.pathname.includes("trang-mua-sam.html") && !window.location.pathname.endsWith("/")) {
-            window.location.href = "trang-mua-sam.html";
+    if (user.vaiTro === "KHACH_HANG") {
+        let currentPath = window.location.pathname;
+        if (!currentPath.includes("trang-mua-sam.html") && !currentPath.includes("gio-hang.html") && !currentPath.includes("thong-tin-tai-khoan.html") && !currentPath.endsWith("/")) {
+            window.location.href = "trang-mua-sam.html"; 
         }
         return;
     }
@@ -36,12 +42,17 @@ function kiemTraDangNhap() {
     phanQuyenMenu(user.vaiTro);
 }
 
+/**
+ * Phân quyền thanh menu ở chế độ Nhân viên/Quản lý
+ * - ADMIN / QUAN_LY: Cho phép thấy 100% chức năng
+ * - NHAN_VIEN: Bị ẩn mục Bảng Điều Khiển (Thống kê) và bị điều hướng sang trang Đơn Hàng nếu vào trang Index
+ */
 function phanQuyenMenu(vaiTro) {
     // Nếu là QUẢN LÝ -> Thấy tất cả mọi thứ
-    if (vaiTro === "admin"||vaiTro === "QUAN_LY") return;
+    if (vaiTro === "ADMIN"||vaiTro === "QUAN_LY") return;
 
     // Nếu là NHÂN VIÊN -> Bạn có thể quyết định họ KHÔNG ĐƯỢC XEM cái gì ở đây
-    if (vaiTro === "STAFF") {
+    if (vaiTro === "NHAN_VIEN") {
         // Ví dụ: Không cho nhân viên xem Bảng Điều Khiển (Doanh thu)
         let menuThongKe = document.getElementById("menu-thongke");
         if (menuThongKe) {
@@ -56,6 +67,10 @@ function phanQuyenMenu(vaiTro) {
 }
 
 
+/**
+ * Xử lý sự kiện đăng xuất
+ * Xóa trắng thẻ localStorage và đẩy user về lại trang đăng nhập (login.html)
+ */
 function dangXuat() {
     if (confirm("Bạn có chắc chắn muốn đăng xuất khỏi hệ thống?")) {
         localStorage.removeItem("user_info"); // Xé thẻ căn cước
@@ -64,6 +79,11 @@ function dangXuat() {
     }
 }
 
+/**
+ * Móc API Khách Hàng để tìm xem tên đăng nhập này thuộc về profile nào
+ * Nếu tìm thấy, ghim cứng mã khách hàng (maKhachHang) vào lại LocalStorage để tiện việc tạo hóa đơn.
+ * @param {string} tenDangNhap - Tên tài khoản đang đăng nhập
+ */
 async function fetchThongTinKhachHang(tenDangNhap) {
     try {
         const response = await fetch('http://localhost:8080/QuanLyCuaHangTienLoi/API/KhachHangAPI');

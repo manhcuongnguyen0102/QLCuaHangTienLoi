@@ -23,6 +23,15 @@ body {
     background-color: var(--bg-light);
     color: var(--text-main);
     line-height: 1.6;
+    background-image: radial-gradient(rgba(46, 204, 113, 0.15) 1.5px, transparent 1.5px);
+    background-size: 25px 25px; /* Khoảng cách giữa các chấm */
+    background-color: var(--bg-body);
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color: var(--text-dark);
+    background-image: 
+        radial-gradient(circle at 10% 10%, rgba(46, 204, 113, 0.05) 0%, transparent 40%),
+        radial-gradient(circle at 90% 90%, rgba(46, 204, 113, 0.05) 0%, transparent 40%);
+    background-attachment: fixed; 
 }
 
 .container {
@@ -168,26 +177,7 @@ body {
 .banner-text h1 { color: var(--primary-green); font-size: 2.2rem; margin-bottom: 10px; }
 .banner-text p { color: #666; max-width: 450px; }
 
-/* =========================================
-   5. BỐ CỤC CHÍNH & CARD SẢN PHẨM
-   ========================================= */
-/*.content-layout { display: flex; gap: 25px; margin-bottom: 60px; }
-.sidebar { flex: 0 0 260px; }
-.category-box {
-    background: var(--white); padding: 18px; border-radius: 8px;
-    border: 1px solid var(--border-color); font-weight: 600; color: #555;
-}
-.product-grid-area {
-    flex: 1; display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px;
-}
-.product-card {
-    background: var(--white); border: 1px solid var(--border-color);
-    border-radius: 10px; padding: 15px; cursor: pointer; transition: 0.3s;
-}
-.product-card:hover { box-shadow: var(--shadow); transform: translateY(-5px); }
-.product-img-placeholder { width: 100%; height: 160px; background: #f0f0f0; margin-bottom: 12px; border-radius: 6px; }
-*/
+
 /* =========================================
    5. BỐ CỤC CHÍNH & CARD SẢN PHẨM (SỬA LẠI ĐỂ GIỐNG ẢNH)
    ========================================= */
@@ -417,4 +407,85 @@ body {
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
+}
+.product-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.product-card:hover {
+    transform: translateY(-8px); /* Nảy lên 8 pixel */
+    box-shadow: 0 12px 24px rgba(46, 204, 113, 0.2); /* Đổ bóng màu xanh lá nhạt */
+}
+
+/* Nút giỏ hàng đổi màu khi hover */
+.product-card:hover .fa-shopping-cart {
+    color: #27ae60;
+    transform: scale(1.2);
+    transition: 0.2s;
+}
+/* =========================================
+   8. CSS CHO THANH TÌM KIẾM 
+   ========================================= */
+.search-bar-container {
+    display: flex;
+    align-items: center;
+    background-color: #f1f3f4;
+    border-radius: 20px;
+    padding: 2px 15px;
+    margin: 0 20px;
+    flex-grow: 1; /* Cho nó giãn ra chiếm khoảng trống ở giữa */
+    max-width: 400px;
+}
+
+.search-bar-container input {
+    border: none;
+    background: transparent;
+    outline: none;
+    padding: 8px 5px;
+    width: 100%;
+    font-size: 0.95rem;
+}
+
+.search-bar-container button {
+    border: none;
+    background: transparent;
+    color: #27ae60;
+    cursor: pointer;
+    font-size: 1.1rem;
+}
+/* =========================================
+   9. CSS PHÂN TRANG (PAGINATION)
+   ========================================= */
+.pagination-area {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 30px;
+    margin-bottom: 50px;
+    width: 100%;
+}
+.page-btn {
+    padding: 8px 15px;
+    border: 1px solid #27ae60;
+    background-color: white;
+    color: #27ae60;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+.page-btn:hover {
+    background-color: #e8f5e9;
+}
+.page-btn.active {
+    background-color: #27ae60;
+    color: white;
+}
+.page-btn:disabled {
+    border-color: #ccc;
+    color: #ccc;
+    cursor: not-allowed;
+    background-color: #f9f9f9;
 }

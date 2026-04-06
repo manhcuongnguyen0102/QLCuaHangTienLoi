@@ -9,5 +9,6 @@ public interface INhaCungCapDAO {
     public boolean them(NhaCungCap ncc);
     public int xoa(String maNCC);
     public boolean capNhat(NhaCungCap ncc);
+    public String sinhMaNCCMoi();
 
 }

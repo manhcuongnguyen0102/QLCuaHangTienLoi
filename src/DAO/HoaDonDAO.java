@@ -11,7 +11,7 @@ import java.util.List;
 
 public class HoaDonDAO implements IHoaDonDAO {
 
-
+    @Override
     public String sinhMaHoaDonMoi() {
         String sql = "SELECT MAX(CAST(SUBSTRING(maHoaDon, 3, LEN(maHoaDon)) AS INT)) FROM HoaDon";
         try (Connection conn = DBConnection.getConnection();
@@ -19,12 +19,12 @@ public class HoaDonDAO implements IHoaDonDAO {
              ResultSet rs = st.executeQuery(sql)) {
             if (rs.next() && rs.getObject(1) != null) {
                 int max = rs.getInt(1);
-                return String.format("HD%02d", max + 1);
+                return String.format("HD%03d", max + 1);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return "HD01";
+        return "HD001";
     }
 
 
@@ -84,7 +84,7 @@ public class HoaDonDAO implements IHoaDonDAO {
             psHD.executeUpdate();
 
             // INSERT CHI TIẾT & TRỪ KHO THEO BATCH
-            String sqlCTHD = "INSERT INTO ChiTietHoaDon (maHoaDon, maSanPham, soLu  ong, giaBan) VALUES (?, ?, ?, ?)";
+            String sqlCTHD = "INSERT INTO ChiTietHoaDon (maHoaDon, maSanPham, soLuong, giaBan) VALUES (?, ?, ?, ?)";
             String sqlCapNhatKho = "UPDATE SanPham SET soLuongTon = soLuongTon - ? WHERE maSanPham = ?";
 
             psCTHD = conn.prepareStatement(sqlCTHD);
@@ -164,7 +164,7 @@ public class HoaDonDAO implements IHoaDonDAO {
         }
         return list;
     }
-
+    @Override
     public List<HoaDon> layTatCa() {
         List<HoaDon> list = new ArrayList<>();
         String sql = "SELECT * FROM HoaDon ORDER BY ngayLap DESC";
@@ -185,7 +185,7 @@ public class HoaDonDAO implements IHoaDonDAO {
         }
         return list;
     }
-
+    @Override
     public HoaDon timTheoMa(String maHD) {
         String sql = "SELECT * FROM HoaDon WHERE maHoaDon = ?";
         try (Connection conn = DBConnection.getConnection();
@@ -207,10 +207,10 @@ public class HoaDonDAO implements IHoaDonDAO {
         }
         return null;
     }
-
+    @Override
     public List<ChiTietHoaDon> layChiTietCuaHoaDon(String maHD) {
         List<ChiTietHoaDon> list = new ArrayList<>();
-        String sql = "SELECT * FROM ChiTietHoaDon WHERE maHoaDon = ?";
+        String sql = "SELECT c.*, s.tenSanPham FROM ChiTietHoaDon c JOIN SanPham s ON c.maSanPham = s.maSanPham WHERE c.maHoaDon = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, maHD);
@@ -222,6 +222,7 @@ public class HoaDonDAO implements IHoaDonDAO {
                     ct.setMaSanPham(rs.getString("maSanPham"));
                     ct.setSoLuong(rs.getInt("soLuong"));
                     ct.setGiaBan(rs.getDouble("giaBan"));
+                    ct.setTenSanPham(rs.getString("tenSanPham"));
                     list.add(ct);
                 }
             }

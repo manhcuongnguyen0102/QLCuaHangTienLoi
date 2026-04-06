@@ -88,6 +88,7 @@ public class LoaiSanPhamDAO implements ILoaiSanPhamDAO {
         }
         return null;
     }
+    @Override
     public String sinhMaLoaiSanPhamMoi(){
         String sql = "SELECT MAX(CAST(SUBSTRING(maLoai, 2, LEN(maLoai)) AS INT)) FROM LoaiSanPham";
 

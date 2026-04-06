@@ -1,6 +1,6 @@
 /* =========================================
-   GIAO DIỆN MODERNSPLIT - ĐỘC QUYỀN MINIMART POS
-========================================= */
+   1. GIAO DIỆN MODERNSPLIT - CẤU HÌNH CƠ BẢN
+   ========================================= */
 
 /* Reset CSS */
 * {
@@ -30,7 +30,9 @@ body {
     100% { background-position: 0% 50%; }
 }
 
-/* BỘ KHUNG SPLIT SCREEN */
+/* =========================================
+   2. BỘ KHUNG CHÍNH (SPLIT SCREEN)
+   ========================================= */
 .split-screen {
     display: flex;
     width: 900px;
@@ -48,7 +50,9 @@ body {
     100% { transform: translateY(0); opacity: 1; }
 }
 
-/* PANE TRÁI - ĐỒ HỌA/GIỚI THIỆU (Nổi bật) */
+/* =========================================
+   3. PHẦN BÊN TRÁI (LEFT PANE - ĐỒ HỌA/GIỚI THIỆU)
+   ========================================= */
 .left-pane {
     flex: 1;
     background: linear-gradient(135deg, rgba(22, 160, 133, 0.9), rgba(46, 204, 113, 0.8)), 
@@ -81,7 +85,9 @@ body {
     opacity: 0.9;
 }
 
-/* PANE PHẢI - CHỨA FORM */
+/* =========================================
+   4. PHẦN BÊN PHẢI (RIGHT PANE - CHỨA FORM BỘ ĐĂNG NHẬP)
+   ========================================= */
 .right-pane {
     flex: 1;
     display: flex;
@@ -113,7 +119,9 @@ body {
     margin-top: 5px;
 }
 
-/* STYLE CHO Ô NHẬP LIỆU CÓ ICON */
+/* =========================================
+   5. STYLE CHO Ô NHẬP LIỆU (INPUT CÓ ICON)
+   ========================================= */
 .input-group {
     margin-bottom: 12px;
 }
@@ -163,7 +171,9 @@ body {
     color: #2ecc71;
 }
 
-/* STYLE NÚT BẤM (Nâng cấp bóng mượt) */
+/* =========================================
+   6. STYLE NÚT BẤM (BUTTONS)
+   ========================================= */
 button {
     width: 100%;
     padding: 14px;
@@ -206,7 +216,9 @@ button:active {
     box-shadow: none;
 }
 
-/* THÀNH PHẦN PHỤ */
+/* =========================================
+   7. THÀNH PHẦN PHỤ & THÔNG BÁO CHỮ (ALERTS/DIVIDER)
+   ========================================= */
 .forgot-password {
     text-align: right;
     margin-top: -10px;

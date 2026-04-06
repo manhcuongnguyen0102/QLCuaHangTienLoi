@@ -1,3 +1,6 @@
+/* =========================================
+   1. ROOT VARIABLES & CẤU HÌNH CƠ BẢN
+   ========================================= */
 :root {
     --primary-green: #2ecc71; 
     --dark-green: #27ae60;
@@ -10,7 +13,9 @@ body {
     margin: 0; padding: 0; display: flex; min-height: 100vh;
 }
 
-/* --- SIDEBAR --- */
+/* =========================================
+   2. THANH ĐIỀU HƯỚNG BÊN TRÁI (SIDEBAR)
+   ========================================= */
 #sidebar {
     width: 260px;
     background: linear-gradient(180deg, var(--primary-green), var(--dark-green));
@@ -29,10 +34,12 @@ body {
 #sidebar .nav-link.active { background-color: white; color: var(--primary-green); font-weight: bold; }
 #sidebar .user-area { margin-top: auto; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.2); text-align: center; }
 
-/* --- MAIN CONTENT --- */
+/* =========================================
+   3. KHU VỰC NỘI DUNG CHÍNH (MAIN CONTENT)
+   ========================================= */
 #main-content { flex-grow: 1; padding: 2rem; overflow-y: auto; }
 
-/* Thẻ thống kê */
+/* 3.1 THẺ THỐNG KÊ (STAT CARDS) */
 .stat-card {
     background-color: white; padding: 1.5rem; border-radius: 12px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; align-items: center;
@@ -54,10 +61,10 @@ body {
 .stat-card .stat-label { color: #6c757d; font-size: 0.9rem; font-weight: 600; text-transform: uppercase;}
 .stat-card .stat-value { font-size: 1.5rem; font-weight: bold; color: #2c3e50; margin-top: 5px;}
 
-/* Panel (Bảng & Biểu đồ) */
+/* 3.2 KHU VỰC PANEL (BẢNG & BIỂU ĐỒ) */
 .dashboard-panel {
     background-color: white; border-radius: 12px; padding: 1.5rem;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 1.5rem; height: 100%;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 1.5rem;
 }
 .panel-title {
     font-size: 1.1rem; font-weight: bold; color: #2c3e50;
@@ -66,14 +73,16 @@ body {
 .table th { color: #6c757d; font-size: 0.9rem; border-top: none; }
 .table td { vertical-align: middle; font-size: 0.95rem; }
 
-/* Thẻ kết quả lọc */
+/* 3.3 THẺ KẾT QUẢ LỌC BIỂU ĐỒ */
 .filter-result-box {
     background: #e8f8f5; border: 1px dashed #1abc9c; border-radius: 8px;
     padding: 10px 15px; text-align: center; display: none; margin-bottom: 15px;
 }
 .filter-result-box span { font-size: 1.2rem; font-weight: bold; color: #16a085; }
 
-/* --- NHẬP KHO --- */
+/* =========================================
+   4. MODAL NHẬP KHO CHUYÊN BIỆT
+   ========================================= */
 .modal-xl { max-width: 1200px !important; }
 .modal-body .row > div { padding: 15px; }
 .modal-body .border-end { border-right: 1px solid #eee !important; }

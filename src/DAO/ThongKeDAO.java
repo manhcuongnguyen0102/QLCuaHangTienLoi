@@ -2,6 +2,7 @@ package DAO;
 
 import API.ThongKeAPI;
 import DaoInterFace.DBConnection;
+import DaoInterFace.IThongKeDAO;
 import model.SanPham;
 import model.ThongKeBieuDo;
 import java.sql.Connection;
@@ -13,12 +14,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ThongKeDAO {
+public class ThongKeDAO implements IThongKeDAO {
 
     // ========================================================
     // NHÓM 1: THỐNG KÊ TỔNG QUAN HÔM NAY (Dùng cho 4 thẻ thẻ bài trên Dashboard)
     // ========================================================
-
+    @Override
     public double doanhThuHomNay() {
         double tong = 0;
         String sql = "SELECT SUM(tongTien) AS tong FROM HoaDon WHERE CAST(ngayLap AS DATE) = CAST(GETDATE() AS DATE)";
@@ -29,7 +30,7 @@ public class ThongKeDAO {
         } catch (SQLException e) { e.printStackTrace(); }
         return tong;
     }
-
+    @Override
     public int soHoaDonHomNay() {
         int tong = 0;
         String sql = "SELECT COUNT(*) AS tong FROM HoaDon WHERE CAST(ngayLap AS DATE) = CAST(GETDATE() AS DATE)";
@@ -40,7 +41,7 @@ public class ThongKeDAO {
         } catch (SQLException e) { e.printStackTrace(); }
         return tong;
     }
-
+    @Override
     public int soKhachHangMoiHomNay() {
         int tong = 0;
         String sql = "SELECT COUNT(*) AS tong FROM KhachHang WHERE CAST(ngayDangKy AS DATE) = CAST(GETDATE() AS DATE)";
@@ -51,7 +52,7 @@ public class ThongKeDAO {
         } catch (SQLException e) { e.printStackTrace(); }
         return tong;
     }
-
+    @Override
     public int soSanPhamSapHet() {
         int tong = 0;
         String sql = "SELECT COUNT(*) AS tong FROM SanPham WHERE soLuongTon < 10";
@@ -66,7 +67,7 @@ public class ThongKeDAO {
     // ========================================================
     // NHÓM 2: THỐNG KÊ KHOẢNG THỜI GIAN & BIỂU ĐỒ
     // ========================================================
-
+    @Override
     public double doanhThuKhoangThoiGian(java.sql.Date tuNgay, java.sql.Date denNgay) {
         double tong = 0;
         String sql = "SELECT SUM(tongTien) AS tong FROM HoaDon WHERE CAST(ngayLap AS DATE) BETWEEN ? AND ?";
@@ -82,6 +83,7 @@ public class ThongKeDAO {
     }
 
     // [HÀM MỚI] Tính lợi nhuận thực tế (Tiền Lãi)
+    @Override
     public double loiNhuanTheoKhoang(java.sql.Date tuNgay, java.sql.Date denNgay) {
         double loiNhuan = 0;
         String sql = "SELECT SUM((sp.giaBan - sp.giaNhap) * cthd.soLuong) AS tienLai " +
@@ -109,7 +111,7 @@ public class ThongKeDAO {
     // ========================================================
     // NHÓM 3: BẢNG XẾP HẠNG (TOP 5)
     // ========================================================
-
+    @Override
     public List<SanPham> layTop5BanChayTrongThang() {
         List<SanPham> list = new ArrayList<>();
         String sql = "SELECT TOP 5 sp.maSanPham, sp.tenSanPham, sp.giaNhap, sp.giaBan, sp.soLuongTon, sp.ngayHetHan, sp.maLoai, sp.maNCC " +
@@ -139,6 +141,7 @@ public class ThongKeDAO {
     }
 
     // [HÀM MỚI] Lấy Top 5 khách hàng chi tiêu nhiều nhất trong tháng
+    @Override
     public List<Map<String, Object>> layTop5KhachHangVIP() {
         List<Map<String, Object>> list = new ArrayList<>();
         String sql = "SELECT TOP 5 kh.maKhachHang, kh.tenKhachHang, kh.soDienThoai, SUM(hd.tongTien) AS tongChiTieu " +
@@ -161,6 +164,7 @@ public class ThongKeDAO {
         } catch (SQLException e) { e.printStackTrace(); }
         return list;
     }
+    @Override
     public List<SanPham> layHangSapHet() {
         List<SanPham> list = new ArrayList<>();
         // Ưu tiên hiện những thằng số lượng ít nhất (nguy cấp nhất) lên đầu bảng
@@ -188,6 +192,7 @@ public class ThongKeDAO {
         return list;
     }
     // Lấy tọa độ biểu đồ theo khoảng thời gian tùy chọn
+    @Override
     public List<ThongKeBieuDo> layDoanhThuBieuDoTheoKhoang(String tuNgay, String denNgay) {
         List<ThongKeBieuDo> list = new ArrayList<>();
         String sql = "SELECT FORMAT(ngayLap, 'dd/MM') AS ngay, SUM(tongTien) AS tongDoanhThu " +
@@ -210,6 +215,7 @@ public class ThongKeDAO {
         }
         return list;
     }
+    @Override
     public List<ThongKeBieuDo> layDoanhThu7NgayQua() {
         List<ThongKeBieuDo> list = new ArrayList<>();
         String sql = "SELECT FORMAT(ngayLap, 'dd/MM') AS ngay, SUM(tongTien) AS tongDoanhThu " +

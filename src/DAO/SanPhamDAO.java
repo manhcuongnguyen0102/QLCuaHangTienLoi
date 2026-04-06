@@ -37,18 +37,7 @@ public class SanPhamDAO implements ISanPhamDAO {
         } catch (SQLException e) { e.printStackTrace(); }
         return list;
     }
-    @Override
-    public SanPham timTheoMa(String maSP) {
-        String sql = SELECT_JOIN_SQL + " WHERE sp.maSanPham = ?";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, maSP);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) return extractSanPham(rs);
-            }
-        } catch (SQLException e) { e.printStackTrace(); }
-        return null;
-    }
+
     @Override
     public boolean them(SanPham sp) {
         if (sp.getMaSanPham() == null || sp.getMaSanPham().isEmpty()) {
@@ -98,6 +87,7 @@ public class SanPhamDAO implements ISanPhamDAO {
         }
         return false;
     }
+    @Override
     public String sinhMaSanPhamMoi() {
         String sql = "SELECT MAX(CAST(SUBSTRING(maSanPham, 3, LEN(maSanPham)) AS INT)) FROM SanPham";
         try (Connection conn = DBConnection.getConnection();
@@ -115,11 +105,14 @@ public class SanPhamDAO implements ISanPhamDAO {
     @Override
     public int xoa(String maSP) {
         // BƯỚC 1: Kiểm tra xem sản phẩm đã có trong chi tiết hóa đơn hay chưa
-        String sqlCheck = "SELECT COUNT(*) FROM ChiTietHoaDon WHERE maSanPham = ?";
+        String sqlCheck = "SELECT " +
+                "(SELECT COUNT(*) FROM ChiTietHoaDon WHERE maSanPham = ?) + " +
+                "(SELECT COUNT(*) FROM ChiTietPhieuNhap WHERE maSanPham = ?) AS TongGiaoDich";
 
         try (Connection conn = DBConnection.getConnection()) {
             try (PreparedStatement psCheck = conn.prepareStatement(sqlCheck)) {
                 psCheck.setString(1, maSP);
+                psCheck.setString(2, maSP);
                 try (ResultSet rs = psCheck.executeQuery()) {
                     if (rs.next() && rs.getInt(1) > 0) {
                         // TRƯỜNG HỢP 1: Đã bán -> Không được xóa
@@ -138,47 +131,13 @@ public class SanPhamDAO implements ISanPhamDAO {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            String errMsg = e.getMessage().toLowerCase();
+            if (errMsg.contains("reference") || errMsg.contains("conflict") || errMsg.contains("foreign key")) {
+                return 2;
+            }
         }
         return 0; // TRƯỜNG HỢP 3: Lỗi hệ thống
     }
-
-    @Override
-    public List<SanPham> timTheoTen(String ten) {
-        List<SanPham> list = new ArrayList<>();
-        String sql = "SELECT * FROM SanPham WHERE tenSanPham LIKE ?";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, "%" + ten + "%");
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    list.add(extractSanPham(rs));
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
-
-    @Override
-    public List<SanPham> layTheoLoai(String maLoai) {
-        List<SanPham> list = new ArrayList<>();
-        String sql = "SELECT * FROM SanPham WHERE maLoai = ?";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, maLoai);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    list.add(extractSanPham(rs));
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
-
-
 
     @Override
     public boolean sua(SanPham sp) {

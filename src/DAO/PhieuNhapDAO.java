@@ -98,6 +98,7 @@ public class PhieuNhapDAO implements IPhieuNhapDAO {
         }
         return false;
     }
+    @Override
     public String sinhMaPhieuNhapMoi() {
         String sql = "SELECT MAX(CAST(SUBSTRING(maPhieuNhap, 3, LEN(maPhieuNhap)) AS INT)) FROM PhieuNhap";
         try (Connection conn = DBConnection.getConnection();
@@ -113,6 +114,7 @@ public class PhieuNhapDAO implements IPhieuNhapDAO {
         }
         return "PN01";
     }
+    @Override
     public List<PhieuNhap> layTatCa() {
 
         List<PhieuNhap> ds = new ArrayList<>();
@@ -137,6 +139,7 @@ public class PhieuNhapDAO implements IPhieuNhapDAO {
 
         return ds;
     }
+    @Override
     public PhieuNhap timTheoMa(String maPhieuNhap) {
         String sql = "SELECT * FROM PhieuNhap WHERE maPhieuNhap = ?";
         try (Connection conn = DBConnection.getConnection();
@@ -157,6 +160,7 @@ public class PhieuNhapDAO implements IPhieuNhapDAO {
         }
         return null;
     }
+    @Override
     public List<ChiTietPhieuNhap> layChiTietCuaPhieu(String maPhieuNhap) {
         List<ChiTietPhieuNhap> list = new ArrayList<>();
         String sql = "SELECT * FROM ChiTietPhieuNhap WHERE maPhieuNhap = ?";

@@ -9,7 +9,10 @@ document.addEventListener("DOMContentLoaded", function() {
     loadSanPhamSapHet();
 });
 
+// =========================================
 // 1. GỌI API TỔNG QUAN HÔM NAY (GET /tongquan)
+// Hiển thị các con số tổng Doanh Thu, Lợi Nhuận, Số Đơn, Khách VIP của ngày hôm nay lên các thẻ.
+// =========================================
 function loadTongQuanHomNay() {
     fetch(`${API_BASE_URL}/tongquan`)
         .then(res => res.json())
@@ -24,7 +27,10 @@ function loadTongQuanHomNay() {
         });
 }
 
-// 2. XỬ LÝ NÚT LỌC (Gọi 3 API: Biểu đồ, Tổng doanh thu, Tổng lợi nhuận)
+// =========================================
+// 2. XỬ LÝ NÚT LỌC DỮ LIỆU TÙY CHỈNH THEO KHOẢNG THỜI GIAN
+// Kích hoạt khi ấn nút "Lọc", gọi đồng thời 3 API: Biểu đồ, Tổng doanh thu, Tổng lợi nhuận để update thẻ filter.
+// =========================================
 function thucHienLoc() {
     let tuNgay = document.getElementById("tuNgay").value;
     let denNgay = document.getElementById("denNgay").value;
@@ -55,7 +61,10 @@ function thucHienLoc() {
         });
 }
 
-// 3. XÓA LỌC (Quay về mặc định)
+// =========================================
+// 3. HỦY KẾT QUẢ VÀ TRỞ BỘ LỌC VỀ BAN ĐẦU
+// Đặt lại các input Date, ẩn panel kết quả và vẽ lại biểu đồ của 7 ngày qua
+// =========================================
 function resetLoc() {
     document.getElementById("tuNgay").value = "";
     document.getElementById("denNgay").value = "";
@@ -63,7 +72,10 @@ function resetLoc() {
     loadBieuDo();
 }
 
-// 4. VẼ BIỂU ĐỒ (GET /doanhthu-bieudo)
+// =========================================
+// 4. VẼ BIỂU ĐỒ DOANH THU TỪNG NGÀY BẰNG CHART.JS
+// Tải mảng dữ liệu JSON về doanh thu và setup một Line Chart mới phủ lên giao diện.
+// =========================================
 function loadBieuDo(tuNgay = "", denNgay = "") {
     let url = `${API_BASE_URL}/doanhthu-bieudo`;
     if(tuNgay && denNgay) url += `?tuNgay=${tuNgay}&denNgay=${denNgay}`;
@@ -105,7 +117,9 @@ function loadBieuDo(tuNgay = "", denNgay = "") {
         });
 }
 
-// 5. TOP SẢN PHẨM (GET /top-sanpham)
+// =========================================
+// 5. CẬP NHẬT BẢNG TOP SẢN PHẨM KHÁCH MUA NHIỀU NHẤT
+// =========================================
 function loadTopSanPham() {
     fetch(`${API_BASE_URL}/top-sanpham`).then(res => res.json()).then(jsonData => {
         if(jsonData.status === "success") {
@@ -118,7 +132,9 @@ function loadTopSanPham() {
     });
 }
 
-// 6. TOP KHÁCH HÀNG VIP (GET /top-khachhang)
+// =========================================
+// 6. CẬP NHẬT BẢNG TOP KHÁCH HÀNG MUA TÍCH CỰC
+// =========================================
 function loadTopKhachHangVIP() {
     fetch(`${API_BASE_URL}/top-khachhang`).then(res => res.json()).then(jsonData => {
         if(jsonData.status === "success") {
@@ -132,7 +148,10 @@ function loadTopKhachHangVIP() {
     });
 }
 
-// 7. CẢNH BÁO HẾT HÀNG (GET /sanpham-saphet)
+// =========================================
+// 7. CẢNH BÁO SẢN PHẨM SẮP HẾT HÀNG TRONG KHO (SL < 10)
+// Lấy danh sách hàng sắp hết để chèn vào panel cảnh báo góc phải
+// =========================================
 function loadSanPhamSapHet() {
     fetch(`${API_BASE_URL}/sanpham-saphet`).then(res => res.json()).then(jsonData => {
         if(jsonData.status === "success") {

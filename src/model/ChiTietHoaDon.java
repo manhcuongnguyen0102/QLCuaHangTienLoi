@@ -6,6 +6,8 @@ public class ChiTietHoaDon {
     private String maSanPham;
     private int soLuong;
     private double giaBan;
+    private String tenSanPham;
+
 
     public ChiTietHoaDon() {
     }
@@ -57,4 +59,6 @@ public class ChiTietHoaDon {
     public void setSoLuong(int soLuong) {
         this.soLuong = soLuong;
     }
+    public String getTenSanPham() { return tenSanPham; }
+    public void setTenSanPham(String tenSanPham) { this.tenSanPham = tenSanPham; }
 }

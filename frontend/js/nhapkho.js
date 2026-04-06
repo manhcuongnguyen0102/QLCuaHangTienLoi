@@ -4,41 +4,92 @@ const URL_NCC = "http://localhost:8080/QuanLyCuaHangTienLoi/API/NhaCungCapAPI";
 
 let danhSachChiTietTam = []; // "Giỏ hàng" chứa các món đang chờ nhập kho
 let danhSachSanPhamGoc = []; // Lưu tạm danh sách SP để lấy tên và giá gốc hiển thị
-
+let allData = []; // Chứa toàn bộ dữ liệu gốc kéo từ DB về
+let filteredData = []; // Chứa dữ liệu sau khi tìm kiếm
+let currentPage = 1;
+const itemsPerPage = 8;
 document.addEventListener("DOMContentLoaded", function() {
     loadLichSuPhieuNhap();
+    searchPhieuNhap();
 });
 
 // ==========================================
 // PHẦN 1: HIỂN THỊ LỊCH SỬ & CHI TIẾT
 // ==========================================
 
+/**
+ * Tải danh sách lịch sử phiếu nhập kho đã tạo (GET PhieuNhapAPI)
+ */
+
+
 function loadLichSuPhieuNhap() {
     fetch(URL_PHIEUNHAP)
         .then(res => res.json())
         .then(jsonData => {
             if (jsonData.status === "success") {
-                let html = "";
-                jsonData.data.forEach(pn => {
-                    html += `
-                        <tr>
-                            <td><span class="badge bg-secondary">${pn.maPhieuNhap}</span></td>
-                            <td>${pn.ngayNhap}</td>
-                            <td><strong>${pn.maNCC}</strong></td>
-                            <td>${pn.maNhanVien}</td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-info" onclick="xemChiTiet('${pn.maPhieuNhap}')">
-                                    <i class="fas fa-eye"></i> Xem Chi Tiết
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                });
-                document.getElementById("bangPhieuNhap").innerHTML = html;
+                allData = jsonData.data; // 1. Lưu toàn bộ vào mảng gốc
+                filteredData = [...allData]; // 2. Ban đầu dữ liệu lọc = dữ liệu gốc
+                currentPage = 1; // 3. Reset về trang 1
+                renderTable(); // 4. Gọi hàm render mới
             }
-        });
+        }).catch(err => console.error(err));
 }
+function renderTable() {
+    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const currentData = filteredData.slice(startIndex, endIndex);
 
+    let html = "";
+    currentData.forEach(pn => {
+        html += `
+            <tr>
+                <td><span class="badge bg-secondary">${pn.maPhieuNhap}</span></td>
+                <td>${pn.ngayNhap}</td>
+                <td><strong>${pn.maNCC}</strong></td>
+                <td>${pn.maNhanVien}</td>
+                <td>
+                    <button class="btn btn-sm btn-outline-info" onclick="xemChiTiet('${pn.maPhieuNhap}')">
+                        <i class="fas fa-eye"></i> Xem Chi Tiết
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+    document.getElementById("bangPhieuNhap").innerHTML = html;
+    renderPagination(totalPages);
+}
+function renderPagination(totalPages) {
+    let paginationHtml = "";
+    for (let i = 1; i <= totalPages; i++) {
+        paginationHtml += `
+            <li class="page-item ${i === currentPage ? 'active' : ''}">
+                <button class="page-link" onclick="changePage(${i})">${i}</button>
+            </li>
+        `;
+    }
+    document.getElementById("pagination-container").innerHTML = paginationHtml;
+}
+function changePage(page) {
+    currentPage = page;
+    renderTable();
+}
+function searchPhieuNhap() {
+   document.getElementById('searchInput').addEventListener('input', function(e) {
+    const keyword = e.target.value.toLowerCase().trim();
+    currentPage = 1; // Ép về trang 1 khi gõ tìm kiếm
+
+    if (keyword === '') {
+        filteredData = allData;
+    } else {
+        filteredData = allData.filter(item => {
+             return item.maPhieuNhap.toLowerCase().includes(keyword);
+        });
+    }
+    
+    renderTable(filteredData); // Vẽ lại bảng với dữ liệu đã lọc
+});
+}
 function xemChiTiet(maPhieuNhap) {
     fetch(`${URL_PHIEUNHAP}?maPhieuNhap=${maPhieuNhap}`)
         .then(res => res.json())
@@ -73,6 +124,9 @@ function xemChiTiet(maPhieuNhap) {
 // PHẦN 2: LOGIC TẠO PHIẾU NHẬP (TRÙM CUỐI)
 // ==========================================
 
+/**
+ * Bật Modal tạo mới phiếu nhập, thực hiện reset data cũ và fill lại Combo box từ API
+ */
 function moFormTaoPhieu() {
     // 1. Reset giỏ hàng và UI
     danhSachChiTietTam = [];
@@ -102,7 +156,9 @@ function moFormTaoPhieu() {
     new bootstrap.Modal(document.getElementById('modalTaoPhieu')).show();
 }
 
-// Hàm hỗ trợ: Tự động điền giá nhập cũ để Thủ kho đỡ phải gõ lại
+/**
+ * Hàm hỗ trợ: Tự động điền giá nhập cũ để Thủ kho đỡ phải gõ lại khi chọn sản phẩm
+ */
 function tuDongDienGiaNhap() {
     let maSP = document.getElementById("selSanPham").value;
     let sp = danhSachSanPhamGoc.find(x => x.maSanPham === maSP);
@@ -111,7 +167,9 @@ function tuDongDienGiaNhap() {
     }
 }
 
-// Thêm sản phẩm vào mảng tạm thời (Giỏ hàng)
+/**
+ * Thêm sản phẩm vào mảng tạm thời (Cơ chế giống giỏ hàng)
+ */
 function themVaoPhieu() {
     let maSP = document.getElementById("selSanPham").value;
     let soLuong = parseInt(document.getElementById("txtSoLuong").value);
@@ -138,7 +196,9 @@ function themVaoPhieu() {
     renderGioHangNhap();
 }
 
-// Vẽ lại bảng Giỏ hàng
+/**
+ * Vẽ lại bảng Giỏ hàng (Mảng tạm các mặt hàng chờ nhập vào kho)
+ */
 function renderGioHangNhap() {
     let html = "";
     if(danhSachChiTietTam.length === 0) {
@@ -160,16 +220,66 @@ function renderGioHangNhap() {
     document.getElementById("bangGioHangNhap").innerHTML = html;
 }
 
-// Xóa 1 món khỏi giỏ
+/**
+ * Cắt 1 item ra khỏi mảng tạm (xóa sản phẩm nhập sai)
+ */
 function xoaKhoiPhieu(index) {
     danhSachChiTietTam.splice(index, 1);
     renderGioHangNhap();
 }
 
-// BẤM NÚT LƯU PHIẾU NHẬP -> GỌI API (POST)
-function luuPhieuNhap() {
+/**
+ * BẤM NÚT LƯU PHIẾU NHẬP -> GỌI API (POST)
+ * Đóng gói DTO và lưu toàn bộ xuống DB
+ */
+// =========================================
+// PHẦN 2: LOGIC TẠO PHIẾU NHẬP (TRÙM CUỐI)
+// =========================================
+
+/**
+ * BẤM NÚT LƯU PHIẾU NHẬP -> GỌI API (POST)
+ * Đóng gói DTO và lưu toàn bộ xuống DB
+ */
+async function luuPhieuNhap() {
     let maNCC = document.getElementById("selNhaCungCap").value;
-    let maNV = "NV01"; // TODO: Lấy từ Session đăng nhập thực tế của tài khoản
+    let userStr = localStorage.getItem("user_info");
+    if (!userStr) {
+        alert("Lỗi: Không tìm thấy thông tin đăng nhập!");
+        return;
+    }
+    
+    let user = JSON.parse(userStr);
+    let maNV = user.maNhanVien;
+
+    // Giải cứu việc `maNhanVien` biến mất khỏi LocalStorage:
+    if (!maNV && user.vaiTro !== "KHACH_HANG") {
+        try {
+            let res = await fetch("http://localhost:8080/QuanLyCuaHangTienLoi/API/NhanVienAPI");
+            let json = await res.json();
+            if (json.status === "success") {
+                let currentNV = json.data.find(nv => nv.tenDangNhap === user.tenDangNhap);
+                if (currentNV) {
+                    maNV = currentNV.maNhanVien;
+                    // Cắm chết vào localStorage để sau này không phải Get lại
+                    user.maNhanVien = maNV;
+                    localStorage.setItem("user_info", JSON.stringify(user));
+                } else {
+                    // Nếu tài khoản không Link sang bảng Nhân viên (Admin siêu cấp) => bốc ngẫu nhiên 1 nhân viên đang làm để cho hệ thống chạy.
+                    const dsDangLam = json.data.filter(nv => nv.trangThai === true || nv.trangThai === 1);
+                    if (dsDangLam.length > 0) {
+                        maNV = dsDangLam[0].maNhanVien;
+                    }
+                }
+            }
+        } catch(e) {
+            console.error("Lỗi tải thông tin bù trừ NhanVienAPI: ", e);
+        }
+    }
+
+    if (!maNV) {
+        alert("Hệ thống không tìm thấy mã Nhân viên phụ trách (Phiếu sẽ bị máy chủ từ chối). Vui lòng thử đăng nhập lại!");
+        return;
+    }
 
     if(!maNCC) { alert("Vui lòng chọn Nhà Cung Cấp!"); return; }
     if(danhSachChiTietTam.length === 0) { alert("Phiếu nhập đang trống!"); return; }

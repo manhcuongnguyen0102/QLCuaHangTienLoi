@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tài khoản của tôi - Cửa Hàng Tiện Lợi</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/trang-mua-sam.css">
+    <style>
+        .profile-container { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
+        /* Phần thông tin cá nhân */
+        .info-card { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); display: flex; gap: 30px; align-items: center; margin-bottom: 30px; border-left: 5px solid #27ae60; }
+        .avatar-circle { width: 100px; height: 100px; background: #e8f5e9; color: #27ae60; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; }
+        .user-details h2 { margin: 0 0 10px 0; color: #2c3e50; }
+        .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .detail-item { font-size: 0.95rem; color: #666; }
+        .detail-item strong { color: #333; }
+        .points-badge { background: #f1c40f; color: #fff; padding: 5px 15px; border-radius: 20px; font-weight: bold; display: inline-block; margin-top: 10px; }
+
+        /* Phần lịch sử đơn hàng */
+        .history-section h3 { border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px; }
+        .order-card { background: #fff; border-radius: 8px; border: 1px solid #eee; margin-bottom: 15px; }
+        .order-header { background: #f9f9f9; padding: 12px 20px; display: flex; justify-content: space-between; border-bottom: 1px solid #eee; }
+        .order-body { padding: 15px 20px; }
+        .order-item { display: flex; justify-content: space-between; font-size: 0.9rem; padding: 5px 0; color: #555; }
+        .order-footer { padding: 12px 20px; text-align: right; border-top: 1px solid #f5f5f5; font-weight: bold; color: #e74c3c; }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <div class="header-content container">
+            <div class="logo-area"><i class="fas fa-store logo-icon"></i><span class="logo-text">Cửa Hàng</span></div>
+            <nav class="main-nav"><a href="trang-mua-sam.html" class="nav-item">Quay lại mua hàng</a></nav>
+            <div class="user-actions">
+                <button class="user-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Đăng xuất</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="profile-container">
+        <div class="info-card">
+            <div class="avatar-circle"><i class="fas fa-user"></i></div>
+            <div class="user-details">
+                <h2 id="display-tenKhachHang">Đang tải...</h2>
+                <div class="detail-grid">
+                    <div class="detail-item"><strong>Tên đăng nhập:</strong> <span id="display-tenDangNhap">...</span></div>
+                    <div class="detail-item"><strong>Số điện thoại:</strong> <span id="display-soDienThoai">...</span></div>
+                </div>
+                <div class="points-badge"><i class="fas fa-coins"></i> Điểm tích lũy: <span id="display-diemTichLuy">0</span></div>
+            </div>
+        </div>
+
+        <div class="history-section">
+            <h3><i class="fas fa-history"></i> Lịch sử mua hàng</h3>
+            <div id="order-history-list">
+                <p>Đang tải lịch sử đơn hàng...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/frontend/js/auth.js"></script>
+    <script src="/frontend/js/thong-tin-tai-khoan.js"></script>
+</body>
+</html>

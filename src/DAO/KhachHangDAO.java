@@ -35,6 +35,7 @@ public class KhachHangDAO implements IKhachHangDAO {
         }
         return ds;
     }
+    @Override
     public String taoMaKhachHangMoi(Connection conn) throws SQLException {
         String sql = "SELECT TOP 1 maKhachHang FROM KhachHang ORDER BY maKhachHang DESC";
         try (PreparedStatement ps = conn.prepareStatement(sql);
@@ -135,6 +136,7 @@ public class KhachHangDAO implements IKhachHangDAO {
 
         return false;
     }
+    @Override
     public boolean capNhatThongTin(String maKH, String tenKHMoi, String sdtMoi) {
         String sql = "UPDATE KhachHang SET tenKhachHang=?, soDienThoai=? WHERE maKhachHang=?";
         try (Connection conn = DBConnection.getConnection();

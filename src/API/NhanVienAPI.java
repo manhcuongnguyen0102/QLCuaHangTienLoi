@@ -168,13 +168,42 @@ public class NhanVienAPI extends HttpServlet {
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setCharacterEncoding("UTF-8");
         resp.setContentType("application/json");
-
-
         resp.setHeader("Access-Control-Allow-Origin", "*");
+
         PrintWriter out = resp.getWriter();
         JsonObject jsonResponse = new JsonObject();
-
         try {
+            String action = req.getParameter("action");
+            if ("restore".equals(action)) {
+                String maNV = req.getParameter("maNV");
+                if (maNV == null || maNV.trim().isEmpty()) {
+                    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    jsonResponse.addProperty("status", "error");
+                    jsonResponse.addProperty("message", "Thiếu mã nhân viên!");
+                    return;
+                }
+                NhanVien nv = nvDAO.timTheoMa(maNV);
+                if (nv == null) {
+                    resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    jsonResponse.addProperty("status", "error");
+                    jsonResponse.addProperty("message", "Không tìm thấy nhân viên!");
+                    return;
+                }
+
+                // Gọi DAO cập nhật trạng thái về 1 (Đang làm việc)
+                boolean restored = tkDAO.capNhatTrangThai(nv.getTenDangNhap(), 1);
+
+                if (restored) {
+                    jsonResponse.addProperty("status", "success");
+                    jsonResponse.addProperty("message", "Khôi phục tài khoản thành công!");
+                    resp.setStatus(HttpServletResponse.SC_OK);
+                } else {
+                    resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    jsonResponse.addProperty("status", "error");
+                    jsonResponse.addProperty("message", "Khôi phục thất bại!");
+                }
+                return; // Xong việc thì dừng lại, không chạy xuống phần update JSON bên dưới nữa
+            }
             BufferedReader reader = req.getReader();
             NhanVienUpdateRequest updateReq = gson.fromJson(reader, NhanVienUpdateRequest.class);
 

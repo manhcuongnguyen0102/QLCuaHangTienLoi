@@ -146,7 +146,7 @@ public class NhaCungCapDAO implements INhaCungCapDAO {
         }
         return 0; // Lỗi hệ thống hoặc mã sai
     }
-
+    @Override
     public String sinhMaNCCMoi() {
         // Mã là NCC01 -> Cắt từ vị trí thứ 4 trở đi để lấy phần số
         String sql = "SELECT MAX(CAST(SUBSTRING(maNCC, 4, LEN(maNCC)) AS INT)) FROM NhaCungCap";

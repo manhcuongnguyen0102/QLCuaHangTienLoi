@@ -63,9 +63,21 @@ public class HoaDonAPI extends HttpServlet {
             } else if (maKhachHang != null && !maKhachHang.trim().isEmpty()) {
                 // TRƯỜNG HỢP 2: Lấy lịch sử mua hàng của 1 Khách Hàng
                 List<HoaDon> list = dao.layLichSu(maKhachHang);
+                com.google.gson.JsonArray jsonArray = new com.google.gson.JsonArray();
+                for (HoaDon hd : list) {
+                    // Lấy chi tiết của hóa đơn này
+                    List<ChiTietHoaDon> chiTiet = dao.layChiTietCuaHoaDon(hd.getMaHoaDon());
+
+                    // Chuyển hóa đơn thành JsonObject và nhét mảng chi tiết vào bụng nó
+                    JsonObject hdJson = gson.toJsonTree(hd).getAsJsonObject();
+                    hdJson.add("danhSachChiTiet", gson.toJsonTree(chiTiet));
+
+                    // Thêm vào mảng tổng
+                    jsonArray.add(hdJson);
+                }
                 response.setStatus(HttpServletResponse.SC_OK);
                 json.addProperty("status", "success");
-                json.add("data", gson.toJsonTree(list));
+                json.add("data", jsonArray);
             } else {
                 // TRƯỜNG HỢP 3: Lấy toàn bộ danh sách Hóa Đơn (Cho Quản lý xem)
                 List<HoaDon> list = dao.layTatCa();

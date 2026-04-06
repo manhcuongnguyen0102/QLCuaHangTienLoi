@@ -1,3 +1,9 @@
+/**
+ * SCRIPT QUẢN LÝ QUY TRÌNH KHÔI PHỤC MẬT KHẨU
+ * Chia làm 2 bước (currentStep):
+ * Bước 1: Gửi SDT lên Server kiểm tra xem tồn tại hay không.
+ * Bước 2: Hiển thị form nhập Pass mới, kết hợp SDT bước 1 để lưu vào Database.
+ */
 document.addEventListener('DOMContentLoaded', function() {
     const forgotForm = document.getElementById('forgotPasswordForm');
     const messageBox = document.getElementById('messageBox');
@@ -8,7 +14,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let currentStep = 1;
 
-    // Hàm hiển thị thông báo
+    /**
+     * Hàm hiển thị trạng thái xử lý
+     * @param {string} text - Thông điệp cần hiển thị
+     * @param {boolean} isError - Trạng thái: Lỗi (true -> đỏ) / Thành công (false -> xanh)
+     */
     function showMessage(text, isError) {
         messageBox.style.display = 'block';
         messageBox.textContent = text;

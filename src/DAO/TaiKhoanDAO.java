@@ -78,7 +78,7 @@ public class TaiKhoanDAO implements ITaiKhoanDAO {
         return false;
     }
 
-    @Override
+    /*@Override
     public boolean dangKyTaiKhoan(String tenDangNhap, String matKhau) {
         // ĐỔI 'NhanVien' THÀNH 'KhachHang' ĐỂ BẢO MẬT HỆ THỐNG
         String sql = "INSERT INTO TaiKhoan (tenDangNhap, matKhau, vaiTro, trangThai) VALUES (?, ?, 'CUSTOMER', 1)";
@@ -91,7 +91,7 @@ public class TaiKhoanDAO implements ITaiKhoanDAO {
             e.printStackTrace();
         }
         return false;
-    }
+    }*/
     @Override
     public boolean kiemTraTonTai(String tenDangNhap) {
         String sql = "SELECT 1 FROM TaiKhoan WHERE tenDangNhap = ?";
@@ -160,7 +160,7 @@ public class TaiKhoanDAO implements ITaiKhoanDAO {
             }
         }
     }
-
+    @Override
     public boolean kiemTraSDTExist(String sdt) {
         String sql = "SELECT 1 FROM KhachHang WHERE soDienThoai = ?";
         try (Connection conn = DBConnection.getConnection();
@@ -193,16 +193,5 @@ public class TaiKhoanDAO implements ITaiKhoanDAO {
         return false;
     }
 
-    public boolean taoTaiKhoanNhanVien(String tenDangNhap, String matKhau) {
-        String sql = "insert into TaiKhoan (tenDangNhap, matKhau, vaiTro, trangThai) values (?, ?, 'STAFF', 1)";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, tenDangNhap);
-            ps.setString(2, matKhau);
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
+
 }

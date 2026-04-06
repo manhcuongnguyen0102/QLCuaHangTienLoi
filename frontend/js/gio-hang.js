@@ -1,15 +1,16 @@
-let cart = [];
+//let cart = [];
+let cart = JSON.parse(localStorage.getItem('shopping_cart')) || [];
 let currentUser = null;
 let khachHangInfo = null;
 let usePoints = false;
 let discountAmount = 0;
 let pointsUsed = 0;
 
-const API_SANPHAM = 'http://localhost:8080/API/SanPhamAPI';
-const API_KHACHHANG = 'http://localhost:8080/API/KhachHangAPI';
-const API_HOADON = 'http://localhost:8080/API/HoaDonAPI';
-
-const POINT_EARN_RATE = 10000;   // 10.000đ = 1 điểm tích lũy
+const API_SANPHAM = 'http://localhost:8080/QuanLyCuaHangTienLoi/API/SanPhamAPI';
+const API_KHACHHANG = 'http://localhost:8080/QuanLyCuaHangTienLoi/API/KhachHangAPI';
+const API_HOADON = 'http://localhost:8080/QuanLyCuaHangTienLoi/API/HoaDonAPI';
+ 
+const POINT_EARN_RATE = 10000;   // 10.000đ = điểm tích lũy
 const POINT_REDEEM_RATE = 100;   // 1 điểm = 100đ giảm giá
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -21,6 +22,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupUserMenu();
 });
 
+/**
+ * KIỂM TRA QUYỀN TRUY CẬP GIỎ HÀNG
+ * - Nếu chưa đăng nhập: Yêu cầu Login
+ * - Nếu không phải khách hàng (Admin/NV): Đá về dashboard
+ */
 async function checkLoginAndPermission() {
     let userStr = localStorage.getItem("user_info");
     if (!userStr) {
@@ -29,7 +35,7 @@ async function checkLoginAndPermission() {
         return false;
     }
     currentUser = JSON.parse(userStr);
-    if (currentUser.vaiTro !== "CUSTOMER") {
+    if (currentUser.vaiTro !== "KHACH_HANG") {
         alert("Tài khoản không có quyền mua hàng!");
         window.location.href = "index.html";
         return false;
@@ -39,6 +45,10 @@ async function checkLoginAndPermission() {
     return true;
 }
 
+/**
+ * KÉO THÔNG TIN ƯU ĐÃI KHÁCH HÀNG
+ * Lấy số điểm hiện tại để hiển thị phần chiết khấu
+ */
 async function fetchKhachHangInfo() {
     try {
         const response = await fetch(API_KHACHHANG);
@@ -59,7 +69,10 @@ async function fetchKhachHangInfo() {
     }
 }
 
-// Cập nhật tồn kho thực tế từ database cho tất cả sản phẩm trong giỏ (có log chi tiết)
+/**
+ * LOGIC KIỂM SOÁT TỒN KHO THỰC TẾ TRONG GIỎ HÀNG (REALTIME)
+ * Duyệt vòng lặp gọi API quét lại Data số lượng tồn, ép tụt số lượng giỏ nếu kho hết hàng.
+ */
 async function updateAllStockFromAPI() {
     for (let i = 0; i < cart.length; i++) {
         const item = cart[i];
@@ -93,6 +106,10 @@ async function updateAllStockFromAPI() {
     saveCartToLocalStorage();
 }
 
+/**
+ * Tách chuỗi LocalStorage trả vào biến mảng giỏ hàng "cart"
+ * Kết hợp quét kiểm tra tồn kho đồng hộ Data.
+ */
 async function loadCartFromLocalStorage() {
     let stored = localStorage.getItem("shopping_cart");
     if (stored) {
@@ -120,10 +137,10 @@ function saveCartToLocalStorage() {
 }
 
 function updateCartCountOnHeader() {
-    const distinctCount = cart.length;
-    document.querySelectorAll('.cart-count').forEach(span => span.innerText = distinctCount);
+    const totalQty = cart.reduce((sum, item) => sum + (item.soLuong || 0), 0);
+    document.querySelectorAll('.cart-count').forEach(span => span.innerText = totalQty);
     let countSpan = document.getElementById('cart-item-count');
-    if (countSpan) countSpan.innerText = `(${distinctCount} sản phẩm)`;
+    if (countSpan) countSpan.innerText = `(${totalQty} sản phẩm)`;
 }
 
 function getSelectedTotal() {
@@ -208,6 +225,10 @@ function deleteSelected() {
     }
 }
 
+/**
+ * THUẬT TOÁN BUILD HTML GIỎ HÀNG BÊN PHÍA CLIENT
+ * Load mảng Item và in table, chèn JS event tính giá tiền, áp điểm cho mỗi lượt click/nhập.
+ */
 function renderCart() {
     const container = document.getElementById('cart-content');
     if (!container) return;
@@ -215,7 +236,7 @@ function renderCart() {
     if (cart.length === 0) {
         container.innerHTML = `<div class="empty-cart">
             <i class="fas fa-shopping-basket"></i>
-            <p>Giỏ hàng trống. Hãy <a href="mua-sap.html">mua sắm ngay</a>!</p>
+            <p>Giỏ hàng trống. Hãy <a href="trang-mua-sam.html">mua sắm ngay</a>!</p>
         </div>`;
         return;
     }
@@ -409,6 +430,10 @@ function showInvoiceModal(orderData, selectedItems, selectedTotal, discount, fin
     };
 }
 
+/**
+ * GIAO DỊCH CUỐI CÙNG HOÀN TẤT ĐƠN HÀNG (POST MÃ HÓA ĐƠN VÀ DTO CHI TIẾT LÊN SERVER)
+ * @param {object} orderData Dữ liệu cấu trúc hóa đơn gửi đi
+ */
 async function executeCheckout(orderData, finalTotal, pointsUsed, discount) {
     const btn = document.getElementById('checkoutBtn');
     if (btn) { btn.disabled = true; btn.innerHTML = 'Đang xử lý...'; }
@@ -432,7 +457,7 @@ async function executeCheckout(orderData, finalTotal, pointsUsed, discount) {
             cart = cart.filter(item => item.selected !== true);
             saveCartToLocalStorage();
             renderCart();
-            setTimeout(() => window.location.href = "mua-sap.html", 1500);
+            setTimeout(() => window.location.href = "trang-mua-sam.html", 1500);
         } else {
             alert("Thanh toán thất bại: " + data.message);
             if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-credit-card"></i> ĐẶT HÀNG NGAY'; }
@@ -444,6 +469,10 @@ async function executeCheckout(orderData, finalTotal, pointsUsed, discount) {
     }
 }
 
+/**
+ * MỞ BẢNG XÁC NHẬN THANH TOÁN (POPUP CHỐT ĐƠN)
+ * Gom biến hóa đơn, chạy vòng xác nhận Tồn Kho lần cuối.
+ */
 async function checkout() {
     // Kiểm tra tồn kho trước
     const validation = await validateAndFixStockBeforeCheckout();
@@ -460,7 +489,7 @@ async function checkout() {
     }
 
     let user = JSON.parse(localStorage.getItem("user_info"));
-    if (!user || user.vaiTro !== "CUSTOMER") {
+    if (!user || user.vaiTro !== "KHACH_HANG") {
         alert("Vui lòng đăng nhập!");
         window.location.href = "login.html";
         return;
@@ -483,9 +512,31 @@ async function checkout() {
         finalTotal = calc.finalTotal;
         pointsUsed = calc.pointsUsed;
     }
-
+    let randomNhanVien = "NV001"
+    try {
+        
+        const nvRes = await fetch("http://localhost:8080/QuanLyCuaHangTienLoi/API/NhanVienAPI");
+        const nvJson = await nvRes.json();
+        if (nvJson.status === "success" && nvJson.data.length > 0) {
+            // Lọc ra NHỮNG NGƯỜI ĐANG LÀM VIỆC (tránh giao đơn cho người đã nghỉ)
+            const dsDangLam = nvJson.data.filter(nv => nv.trangThai === true || nv.trangThai === 1);
+            
+            // Nếu có người đang làm thì bốc ngẫu nhiên 1 người
+            if (dsDangLam.length > 0) {
+                const randomIndex = Math.floor(Math.random() * dsDangLam.length);
+                randomNhanVien = dsDangLam[randomIndex].maNhanVien;
+            } else {
+                // Nếu đen đủi công ty nghỉ hết, bốc đại trong danh sách gốc
+                const randomIndex = Math.floor(Math.random() * nvJson.data.length);
+                randomNhanVien = nvJson.data[randomIndex].maNhanVien;
+            }
+        }
+    } catch (error) {
+        console.error("Lỗi lấy danh sách nhân viên để random:", error);
+        // Nếu lỗi, biến randomNhanVien vẫn giữ nguyên là "NV001" để bill không bị tạch
+    }
     const orderData = {
-        maNhanVien: "ONLINE",
+        maNhanVien: randomNhanVien,
         maKhachHang: user.maKhachHang,
         tongTien: finalTotal,
         danhSachChiTiet: selectedItems.map(item => ({

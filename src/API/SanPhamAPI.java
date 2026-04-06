@@ -166,7 +166,7 @@ public class SanPhamAPI extends HttpServlet {
             } else if (ketQua == 2) {
                 resp.setStatus(HttpServletResponse.SC_CONFLICT); // Lỗi 409: Xung đột dữ liệu
                 jsonResponse.addProperty("status", "error");
-                jsonResponse.addProperty("message", "Không thể xóa! Sản phẩm này đã có trong lịch sử hóa đơn.");
+                jsonResponse.addProperty("message", "Không thể xóa! Sản phẩm này đã tồn tại trong lịch sử Hóa đơn hoặc Phiếu nhập kho.");
             } else {
                 resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 jsonResponse.addProperty("status", "error");
