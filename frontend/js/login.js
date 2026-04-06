@@ -31,8 +31,8 @@ document.addEventListener('DOMContentLoaded', function() {
         loginBtn.disabled = true;
 
         // 2. Cấu hình URL API (Giữ nguyên như cũ của bạn)
-        const urlAPI = 'http://localhost:8080/API/LoginAPI';
-         
+        const urlAPI = 'http://localhost:8080/QuanLyCuaHangTienLoi/API/LoginAPI';
+
         // 3. Gọi Fetch API
         fetch(urlAPI, {
             method: 'POST',

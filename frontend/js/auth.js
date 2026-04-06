@@ -59,6 +59,25 @@ function phanQuyenMenu(vaiTro) {
 function dangXuat() {
     if (confirm("Bạn có chắc chắn muốn đăng xuất khỏi hệ thống?")) {
         localStorage.removeItem("user_info"); // Xé thẻ căn cước
+        localStorage.removeItem("shopping_cart");
         window.location.href = "login.html";  // Trở về nơi bắt đầu
+    }
+}
+
+async function fetchThongTinKhachHang(tenDangNhap) {
+    try {
+        const response = await fetch('http://localhost:8080/QuanLyCuaHangTienLoi/API/KhachHangAPI');
+        const data = await response.json();
+        if (data.status === "success") {
+            const khachHang = data.data.find(kh => kh.tenDangNhap === tenDangNhap);
+            if (khachHang) {
+                let user = JSON.parse(localStorage.getItem("user_info"));
+                user.maKhachHang = khachHang.maKhachHang;
+                user.tenKhachHang = khachHang.tenKhachHang;
+                localStorage.setItem("user_info", JSON.stringify(user));
+            }
+        }
+    } catch (error) {
+        console.error("Lỗi lấy thông tin khách hàng:", error);
     }
 }
