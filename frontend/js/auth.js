@@ -58,13 +58,18 @@ function phanQuyenMenu(vaiTro) {
         if (menuThongKe) {
             menuThongKe.style.display = "none";
         }
-        
-        // Nếu Nhân viên vào thẳng trang index.html bằng cách gõ URL, đuổi sang trang Đơn hàng
-        if (window.location.pathname.includes("index.html")) {
-            window.location.href = "quanlydonhang.html";
+        const path= window.location.pathname;
+        if (path.includes("index.html") || path.endsWith("/")) {
+            
+            // [THÊM DÒNG NÀY Ở ĐÂY] - Hiện thông báo dằn mặt nhẹ nhàng
+            alert("⛔ Cảnh báo bảo mật: Tài khoản Nhân viên không có quyền xem Bảng Điều Khiển doanh thu. Hệ thống sẽ chuyển hướng bạn về trang Đơn Hàng!");
+            
+            // Bấm OK xong sẽ tự động bay sang trang này
+            window.location.href = "quanlydonhang.html"; 
         }
     }
 }
+
 
 
 /**

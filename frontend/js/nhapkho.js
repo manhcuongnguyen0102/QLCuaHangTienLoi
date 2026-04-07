@@ -11,6 +11,7 @@ const itemsPerPage = 8;
 document.addEventListener("DOMContentLoaded", function() {
     loadLichSuPhieuNhap();
     searchPhieuNhap();
+    document.getElementById("selNhaCungCap").addEventListener("change", locSanPhamTheoNCC);
 });
 
 // ==========================================
@@ -148,7 +149,8 @@ function moFormTaoPhieu() {
         let html = "<option value=''>-- Chọn Sản Phẩm Cần Nhập --</option>";
         if(json.status === "success") {
             danhSachSanPhamGoc = json.data; // Lưu lại để dùng sau
-            json.data.forEach(sp => { html += `<option value="${sp.maSanPham}">${sp.tenSanPham} (Tồn: ${sp.soLuongTon})</option>`; });
+            //json.data.forEach(sp => { html += `<option value="${sp.maSanPham}">${sp.tenSanPham} (Tồn: ${sp.soLuongTon})</option>`; });
+            locSanPhamTheoNCC();
         }
         document.getElementById("selSanPham").innerHTML = html;
     });
@@ -248,7 +250,7 @@ async function luuPhieuNhap() {
         return;
     }
     
-    let user = JSON.parse(userStr);
+    let user = JSON.parse(userStr)
     let maNV = user.maNhanVien;
 
     // Giải cứu việc `maNhanVien` biến mất khỏi LocalStorage:
@@ -307,4 +309,32 @@ async function luuPhieuNhap() {
         }
     })
     .catch(err => alert("Lỗi kết nối tới Server!"));
+}
+/**
+ * Lọc danh sách sản phẩm trong Dropdown dựa theo Nhà Cung Cấp đã chọn
+ */
+function locSanPhamTheoNCC() {
+    // 1. Lấy mã Nhà Cung Cấp đang được chọn
+    const maNccDuocChon = document.getElementById("selNhaCungCap").value;
+    const selSanPham = document.getElementById("selSanPham");
+
+    // 2. Lấy danh sách sản phẩm gốc để lọc
+    let danhSachLoc = danhSachSanPhamGoc; 
+
+    // Nếu có chọn 1 NCC cụ thể, thì lọc giữ lại những SP của NCC đó
+    if (maNccDuocChon !== "") {
+        danhSachLoc = danhSachSanPhamGoc.filter(sp => sp.maNCC === maNccDuocChon);
+    }
+
+    // 3. Vẽ lại các thẻ <option> cho Dropdown Sản Phẩm
+    let html = "<option value=''>-- Chọn Sản Phẩm Cần Nhập --</option>";
+    if (danhSachLoc.length === 0 && maNccDuocChon !== "") {
+        html = "<option value=''>-- Nhà CC này chưa có sản phẩm nào --</option>";
+    } else {
+        danhSachLoc.forEach(sp => { 
+            html += `<option value="${sp.maSanPham}">${sp.tenSanPham} (Tồn: ${sp.soLuongTon})</option>`; 
+        });
+    }
+    
+    selSanPham.innerHTML = html;
 }
