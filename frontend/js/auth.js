@@ -59,10 +59,10 @@ function phanQuyenMenu(vaiTro) {
             menuThongKe.style.display = "none";
         }
         const path= window.location.pathname;
-        if (path.includes("index.html") || path.endsWith("/")) {
+        if (path.includes("index.html") || path.endsWith("/") || path.includes("nhanvien.html")) {
             
             // [THÊM DÒNG NÀY Ở ĐÂY] - Hiện thông báo dằn mặt nhẹ nhàng
-            alert("⛔ Cảnh báo bảo mật: Tài khoản Nhân viên không có quyền xem Bảng Điều Khiển doanh thu. Hệ thống sẽ chuyển hướng bạn về trang Đơn Hàng!");
+            alert("⛔ Cảnh báo bảo mật: Tài khoản Nhân viên không có quyền truy cập trang này. Hệ thống sẽ chuyển hướng bạn về trang Đơn Hàng!");
             
             // Bấm OK xong sẽ tự động bay sang trang này
             window.location.href = "quanlydonhang.html"; 

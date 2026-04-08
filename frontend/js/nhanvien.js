@@ -11,8 +11,8 @@ document.addEventListener("DOMContentLoaded", function() {
     if (userStr) {
         let user = JSON.parse(userStr);
         if (user.vaiTro !== "ADMIN" && user.vaiTro !== "QUAN_LY") {
-            alert("CẢNH BÁO: Khu vực này chỉ dành cho Ban Quản Lý!");
-            window.location.href = "index.html"; // Đuổi về Dashboard ngay
+            // alert("CẢNH BÁO: Khu vực này chỉ dành cho Ban Quản Lý!");
+            // window.location.href = "index.html"; // Đuổi về Dashboard ngay
             return;
         }
     }
@@ -206,7 +206,6 @@ function capNhatTrangThai(maNV, tenNV, trangThaiMoi) {
     
     if (confirm(`Bạn có chắc chắn muốn ${hanhDong} [${tenNV}] không?`)) {
         
-        // Cũ của sếp: Chỉ có DELETE để xóa. 
         // Mới: Nếu nghỉ việc (0) thì gọi DELETE. Nếu khôi phục (1) thì gọi PUT kèm tham số.
         let methodCall = trangThaiMoi === 0 ? "DELETE" : "PUT";
         let urlCall = trangThaiMoi === 0 
